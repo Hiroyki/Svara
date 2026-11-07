@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# hasil build
+dist/
+dist-windows/
+windows/.cache/
+windows/.stage/
+windows/payload.zip
+windows/payload.id
+windows/*.syso

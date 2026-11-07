@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Senandung</title>
+  <meta name="description" content="Pemutar musik pribadi tanpa iklan, lengkap sama lirik.">
+  <meta name="theme-color" content="#121118">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="paused">
+  <a class="skip" href="#view">Langsung ke konten</a>
+
+  <div id="app">
+    <header class="top">
+      <a class="logo" href="#/home" aria-label="Senandung, ke beranda"><img src="assets/logo.png" alt="" width="34" height="47"><span>Senandung</span></a>
+      <div class="top-mid" id="nav">
+        <a class="home-btn" href="#/home" data-nav="home" title="Beranda" aria-label="Beranda"><i data-ic="home"></i></a>
+        <label class="search">
+          <i data-ic="search"></i>
+          <input id="q" type="search" placeholder="Mau dengerin apa?" autocomplete="off" spellcheck="false" aria-label="Cari lagu, artis, atau album" enterkeyhint="search">
+          <kbd>⌘K</kbd>
+        </label>
+      </div>
+      <div class="top-r"><a class="m-search" href="#/search" aria-label="Cari"><i data-ic="search"></i></a></div>
+    </header>
+
+    <aside class="lib" id="lib" aria-label="Koleksi"></aside>
+    <main id="view" tabindex="-1"></main>
+    <aside class="side" id="side" aria-label="Sedang diputar"></aside>
+  </div>
+
+  <footer class="bar" id="lcd" aria-label="Pemutar">
+    <span class="mprog" aria-hidden="true"></span>
+    <div class="pb-now">
+      <button class="lcd-art" data-act="np" title="Layar penuh" aria-label="Buka layar Sedang Diputar"><img alt=""></button>
+      <div class="pb-meta">
+        <div class="lcd-t" data-np="title"></div>
+        <div class="lcd-s" data-np="sub"></div>
+      </div>
+      <button class="ib sm" data-act="love" title="Suka" aria-label="Suka"></button>
+    </div>
+    <div class="pb-mid">
+      <div class="ctl">
+        <button class="ib sm" data-act="shuffle" title="Acak" aria-label="Acak"></button>
+        <button class="ib" data-act="prev" title="Sebelumnya" aria-label="Sebelumnya"></button>
+        <button class="ib play" data-act="play" title="Putar (Spasi)" aria-label="Putar atau jeda"></button>
+        <button class="ib" data-act="next" title="Berikutnya" aria-label="Berikutnya"></button>
+        <button class="ib sm" data-act="repeat" title="Ulangi" aria-label="Ulangi"></button>
+      </div>
+      <div class="pb-seek">
+        <span class="mono" data-np="cur">0:00</span>
+        <div class="rng"><input type="range" class="seek" min="0" max="1000" value="0" aria-label="Posisi lagu"></div>
+        <span class="mono" data-np="left">0:00</span>
+      </div>
+    </div>
+    <div class="right">
+      <button class="ib sm" data-act="sleep" title="Timer tidur" aria-label="Timer tidur"></button>
+      <button class="ib sm" data-act="lyrics" title="Lirik (L)" aria-label="Lirik"></button>
+      <button class="ib sm" data-act="queue" title="Antrean" aria-label="Antrean"></button>
+      <button class="ib sm" data-act="side" title="Panel Sedang Diputar" aria-label="Panel Sedang Diputar"><i data-ic="side"></i></button>
+      <button class="ib sm" data-act="mute" title="Bisu (M)" aria-label="Bisu"></button>
+      <div class="rng vol-w"><input type="range" class="vol" min="0" max="100" value="80" aria-label="Volume"></div>
+      <button class="ib sm" data-act="np" title="Layar penuh" aria-label="Layar penuh"><i data-ic="full"></i></button>
+    </div>
+  </footer>
+
+  <nav id="tabs" class="tabs" aria-label="Navigasi bawah">
+    <a href="#/home" data-nav="home"><i data-ic="home"></i><span>Beranda</span></a>
+    <a href="#/search" data-nav="search"><i data-ic="search"></i><span>Cari</span></a>
+    <a href="#/lib" data-nav="lib"><i data-ic="lib"></i><span>Koleksi</span></a>
+  </nav>
+
+  <section id="np" class="np" aria-hidden="true" aria-label="Sedang diputar">
+    <button class="np-close ib" data-act="np" title="Tutup (Esc)" aria-label="Tutup"></button>
+    <div class="np-left">
+      <div class="np-art"><img alt=""></div>
+      <div class="np-meta">
+        <div><div class="np-t" data-np="title"></div><div class="np-s" data-np="sub"></div></div>
+        <button class="ib" data-act="love" aria-label="Suka"></button>
+      </div>
+      <div class="rng big"><input type="range" class="seek" min="0" max="1000" value="0" aria-label="Posisi lagu"></div>
+      <div class="np-time mono"><span data-np="cur">0:00</span><span data-np="left">0:00</span></div>
+      <div class="np-ctl">
+        <button class="ib sm" data-act="shuffle" aria-label="Acak"></button>
+        <button class="ib xl" data-act="prev" aria-label="Sebelumnya"></button>
+        <button class="ib xxl" data-act="play" aria-label="Putar atau jeda"></button>
+        <button class="ib xl" data-act="next" aria-label="Berikutnya"></button>
+        <button class="ib sm" data-act="repeat" aria-label="Ulangi"></button>
+      </div>
+      <div class="np-vol">
+        <button class="ib sm" data-act="mute" aria-label="Bisu"></button>
+        <div class="rng"><input type="range" class="vol" min="0" max="100" value="80" aria-label="Volume"></div>
+        <button class="ib sm" data-act="sleep" aria-label="Timer tidur"></button>
+        <button class="ib sm" data-act="lyrics" aria-label="Lirik"></button>
+        <button class="ib sm" data-act="queue" aria-label="Antrean"></button>
+      </div>
+      <div class="viz np-viz" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="np-right" id="npRight"></div>
+  </section>
+
+  <div id="menu" class="menu" role="menu" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <audio id="audio" preload="auto"></audio>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
