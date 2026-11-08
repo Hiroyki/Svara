@@ -1831,7 +1831,35 @@ function toast(msg) {
 /* ================= simpan & mulai ================= */
 
 const stateObj = () => ({ queue: S.queue, base: S.base, idx: S.idx, shuffle: S.shuffle, repeat: S.repeat, volume: S.volume, muted: audio.muted, pos: audio.currentTime || S.restorePos, panel: S.panel === 'queue' ? 'queue' : null });
-const saveState = debounce(() => kv.set('state', stateObj()), 400);
+const saveState = debounce(() => { kv.set('state', stateObj()); pushRemote(); }, 400);
+
+/* ---------- remote: Nusa (notch) bisa lihat antrean & milih lagu ---------- */
+const remoteHeaders = { 'Content-Type': 'application/json', 'X-Senandung-Remote': '1' };
+const pushRemote = debounce(() => {
+  const from = Math.max(0, S.idx - 1);
+  const queue = S.queue.slice(from, S.idx + 40).map((id, k) => {
+    const t = T(id);
+    return t && { i: from + k, vid: t.vid, title: t.title, artist: t.artist, art: t.art, duration: t.duration || 0 };
+  }).filter(Boolean);
+  fetch('/api/remote/state', { method: 'POST', headers: remoteHeaders, body: JSON.stringify({ idx: S.idx, playing: !audio.paused, queue, at: Date.now() }) }).catch(() => {});
+}, 250);
+async function pollRemote() {
+  try {
+    const cmds = await (await fetch('/api/remote/poll', { cache: 'no-store' })).json();
+    for (const c of cmds) {
+      if (c.cmd === 'jump' && Number.isInteger(c.index)) load(c.index);
+      else if ((c.cmd === 'play' || c.cmd === 'queue') && c.item?.vid && /^[A-Za-z0-9_-]{11}$/.test(c.item.vid)) {
+        const id = song(c.item).id;
+        saveTracks();
+        if (c.cmd === 'queue') playNext([id]);
+        else if (S.idx < 0) playFrom([id]);
+        else { S.queue.splice(S.idx + 1, 0, id); load(S.idx + 1); }
+      }
+    }
+  } catch {}
+  setTimeout(pollRemote, 800);
+}
+for (const ev of ['play', 'pause']) audio.addEventListener(ev, () => pushRemote());
 window.addEventListener('pagehide', () => kv.set('state', stateObj()));
 
 async function init() {
@@ -1884,6 +1912,8 @@ async function init() {
     toast('Server Senandung belum nyala. Jalanin ./senandung di Terminal');
   }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  pushRemote();
+  pollRemote();
 }
 
 init();

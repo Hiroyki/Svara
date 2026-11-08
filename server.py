@@ -879,6 +879,33 @@ def save_track(meta):
     return str(dest)
 
 
+# ---------- remote: app lain di Mac ini (mis. Nusa) bisa milih lagu ----------
+
+class Remote:
+    """Antrean perintah buat halaman Senandung + laporan antrean lagunya.
+
+    Perintah wajib bawa header X-Senandung-Remote, jadi halaman web lain nggak bisa ngirim
+    (header khusus bikin browser minta izin CORS dulu, dan server ini nggak ngasih).
+    """
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.cmds = []
+        self.state = {}
+
+    def push(self, cmd):
+        with self.lock:
+            self.cmds = (self.cmds + [cmd])[-20:]
+
+    def take(self):
+        with self.lock:
+            out, self.cmds = self.cmds, []
+            return out
+
+
+remote = Remote()
+
+
 # ---------- HTTP ----------
 
 class Handler(SimpleHTTPRequestHandler):
@@ -1045,6 +1072,13 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.send_file(ensure_img(arg('u'), any_host=True), 'image/jpeg')
             return self.json({'error': 'nggak dikenal'}, 404)
 
+        if group == 'remote':
+            if action == 'poll':
+                return self.json(remote.take())
+            if action == 'state':
+                return self.json(remote.state)
+            return self.json({'error': 'nggak dikenal'}, 404)
+
         if group == 'lyrics':
             return self.json(lyrics(arg('artist'), arg('title'), arg('album'), float(arg('duration') or 0)))
         if group != 'yt':
@@ -1128,6 +1162,19 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_HEAD()
 
     def do_POST(self):
+        if self.path in ('/api/remote/cmd', '/api/remote/state'):
+            if self.headers.get('X-Senandung-Remote') != '1':
+                return self.json({'error': 'ditolak'}, 403)
+            try:
+                n = int(self.headers.get('Content-Length') or 0)
+                body = json.loads(self.rfile.read(n) or b'{}')
+            except Exception:
+                return self.json({'error': 'json nggak valid'}, 400)
+            if self.path == '/api/remote/cmd':
+                remote.push(body)
+            else:
+                remote.state = body
+            return self.json({'ok': True})
         if self.path != '/api/yt/save':
             return self.json({'error': 'nggak dikenal'}, 404)
         try:
