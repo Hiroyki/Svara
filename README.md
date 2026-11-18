@@ -378,6 +378,8 @@ MIT © 2026 MrColdZs. Lihat [LICENSE](LICENSE).
 
 **Svara** · MIT License © 2026 MrColdZs
 
+[github.com/Hiroyki/Svara](https://github.com/Hiroyki/Svara)
+
 *The artwork carries the colour. Green just means it's on.*
 
 </div>
