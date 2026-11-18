@@ -1,22 +1,22 @@
 <div align="center">
 
-```
-███████╗██╗   ██╗ █████╗ ██████╗  █████╗
+<pre>
+███████╗██╗   ██╗ █████╗ ██████╗  █████╗ 
 ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔══██╗
 ███████╗██║   ██║███████║██████╔╝███████║
 ╚════██║╚██╗ ██╔╝██╔══██║██╔══██╗██╔══██║
 ███████║ ╚████╔╝ ██║  ██║██║  ██║██║  ██║
 ╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
-```
+</pre>
 
 ### *A music player for the* **YouTube Music catalog**
 
-```
+<pre>
 ┌─────────────────────────────────────────────────────────────────────┐
 │   Dark bento interface.  Real catalog data.  No clutter.            │
 │   Browse · Search · Albums · Artists · Playlists · Radio · Lyrics   │
 └─────────────────────────────────────────────────────────────────────┘
-```
+</pre>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ddc6b.svg?style=for-the-badge)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-c2f25c.svg?style=for-the-badge)]()
@@ -32,14 +32,14 @@
 
 <br>
 
-```
-EVERY SURFACE, ONE CODEBASE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Web            ·  npm run dev
+<pre>
+EVERY SURFACE, ONE CODEBASE                               
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━    
+ Web            ·  npm run dev                            
  Windows        ·  Electron shell + Next standalone server
- Android        ·  Capacitor shell + static export
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+ Android        ·  Capacitor shell + static export        
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━    
+</pre>
 
 </div>
 
