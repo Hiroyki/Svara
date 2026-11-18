@@ -38,7 +38,7 @@
     "tailwindcss": "4.3.3",
     "typescript": "^5"
   },
-  "description": "An ad-light music player for the YouTube Music catalog — web, Windows and Android.",
+  "description": "An ad-light music player for the music catalogue — web, Windows and Android.",
   "author": "MrColdZs",
   "license": "MIT",
   "build": {

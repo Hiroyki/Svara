@@ -12,7 +12,7 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: "Svara",
-  description: "Svara — a music player for the YouTube Music catalog.",
+  description: "Svara — a music player for the music catalogue.",
 };
 
 export const viewport: Viewport = {

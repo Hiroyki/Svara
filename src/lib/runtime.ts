@@ -6,5 +6,5 @@
  */
 export const TARGET = (process.env.NEXT_PUBLIC_SVARA_TARGET ?? "web") as "web" | "desktop" | "android";
 
-/** True when there is no Svara server and the app must talk to YouTube Music itself. */
+/** True when there is no Svara server and the app must talk to the catalogue itself. */
 export const IN_APP_DATA = TARGET === "android";

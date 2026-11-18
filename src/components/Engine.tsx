@@ -6,7 +6,7 @@ import { usePlayer } from "@/lib/player";
 import { toast } from "@/lib/ui";
 
 /**
- * Playback engine. Today it drives the official YouTube IFrame Player (hidden).
+ * Playback engine. Today it drives the official embed player (hidden).
  * Everything else in the app talks only to the zustand store, so the engine
  * can be swapped for a different audio source without touching the UI.
  */
@@ -49,7 +49,7 @@ declare global {
 }
 
 let apiPromise: Promise<YTNamespace> | null = null;
-function loadYouTubeApi(): Promise<YTNamespace> {
+function loadPlayerApi(): Promise<YTNamespace> {
   if (window.YT?.Player) return Promise.resolve(window.YT);
   apiPromise ??= new Promise((resolve) => {
     const prev = window.onYouTubeIframeAPIReady;
@@ -87,7 +87,7 @@ export default function Engine() {
   // boot the iframe player once
   useEffect(() => {
     let disposed = false;
-    loadYouTubeApi().then((YT) => {
+    loadPlayerApi().then((YT) => {
       if (disposed || !host.current) return;
       const el = document.createElement("div");
       host.current.appendChild(el);

@@ -123,7 +123,7 @@ function Browse() {
     <div className="space-y-6">
       <div className="pt-2">
         <h1 className="text-[40px] font-extrabold leading-none tracking-[-0.03em]">Browse</h1>
-        <p className="mt-2 text-[13px] font-medium text-muted">Moods and genres from YouTube Music. Or press / to search.</p>
+        <p className="mt-2 text-[13px] font-medium text-muted">Moods and genres from the catalogue. Or press / to search.</p>
       </div>
       {moods ? (
         <MoodGrid chips={moods.chips!} />

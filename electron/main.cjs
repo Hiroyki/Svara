@@ -52,7 +52,7 @@ async function startServer() {
     serviceName: "Svara server",
   });
   await waitFor(`http://127.0.0.1:${port}`);
-  // load via "localhost": YouTube's embed rejects pages served from a bare IP (every song fails as unavailable)
+  // load via "localhost": the embed rejects pages served from a bare IP (every song fails as unavailable)
   return `http://localhost:${port}`;
 }
 

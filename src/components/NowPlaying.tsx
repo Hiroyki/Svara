@@ -19,7 +19,7 @@ function LyricsPanel({ id }: { id: string }) {
     return (
       <div>
         <p className="text-3xl font-bold tracking-[-0.03em] text-white/90">No lyrics for this one.</p>
-        <p className="mt-2 text-[14px] text-white/60">YouTube Music doesn&apos;t have them yet.</p>
+        <p className="mt-2 text-[14px] text-white/60">The catalogue doesn&apos;t have them yet.</p>
       </div>
     );
   }

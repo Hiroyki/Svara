@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
 
 /**
- * Artwork proxy. Browsers sometimes get YouTube's image CDN responses blocked
+ * Artwork proxy. Browsers sometimes get the artwork CDN's responses blocked
  * (ERR_BLOCKED_BY_ORB under bursts of requests); the server fetches them fine.
- * Only YouTube/Google image hosts are allowed, so this can't be used as an open proxy.
+ * Only the catalogue's image hosts are allowed, so this can't be used as an open proxy.
  */
 const ALLOWED = new Set([
   "yt3.googleusercontent.com",

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { usePlayer } from "@/lib/player";
 
 /**
- * Lyrics that follow the song. YouTube Music lyrics have no timestamps, so the
+ * Lyrics that follow the song. Catalogue lyrics have no timestamps, so the
  * "current" line is estimated from playback progress (skipping a short intro
  * and outro). Scrolling by hand pauses the follow for a few seconds.
  */

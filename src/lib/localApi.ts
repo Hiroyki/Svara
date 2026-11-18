@@ -3,7 +3,7 @@
 /**
  * In-app replacement for the /api routes, used by the Android build where no
  * Svara server exists. Capacitor's native HTTP (CapacitorHttp) carries the
- * YouTube Music requests, so the browser's CORS rules don't apply.
+ * catalogue requests, so the browser's CORS rules don't apply.
  * The same normalisers as the server (lib/yt.ts) produce identical JSON.
  */
 export async function localApi(url: string): Promise<unknown> {

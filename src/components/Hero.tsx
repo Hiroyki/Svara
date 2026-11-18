@@ -18,7 +18,7 @@ export default function Hero({
   className = "",
 }: {
   image?: string;
-  /** Used when `image` fails to load (YouTube's CDN occasionally refuses a banner). */
+  /** Used when `image` fails to load (the CDN occasionally refuses a banner). */
   fallback?: string;
   label: React.ReactNode;
   title: string;

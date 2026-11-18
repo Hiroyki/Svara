@@ -4,7 +4,7 @@ import { IN_APP_DATA } from "./runtime";
 
 const ART_HOSTS = /^https:\/\/(yt3|lh3)\.(googleusercontent|ggpht)\.com\/|^https:\/\/i9?\.ytimg\.com\//;
 
-/** Same-origin URL for a YouTube artwork image (see app/api/img). Android has no proxy route. */
+/** Same-origin URL for a catalogue artwork image (see app/api/img). Android has no proxy route. */
 export function proxyArt(url: string): string {
   return !IN_APP_DATA && ART_HOSTS.test(url) ? `/api/img?u=${encodeURIComponent(url)}` : url;
 }

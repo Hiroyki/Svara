@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  *   web (default) — normal Next.js server
  *   desktop       — standalone server that Electron bundles and starts locally
  *   android       — static export for Capacitor; /api route files (route.ts) are
- *                   left out and the app fetches YouTube Music itself (lib/localApi.ts)
+ *                   left out and the app fetches the catalogue itself (lib/localApi.ts)
  */
 const target = process.env.SVARA_TARGET ?? "web";
 

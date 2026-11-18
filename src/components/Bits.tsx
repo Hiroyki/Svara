@@ -43,7 +43,7 @@ export function CardsSkeleton({ n = 6 }: { n?: number }) {
 export function ErrorState({ message, onRetry }: { message?: string; onRetry?: () => void }) {
   return (
     <div className="py-24 text-center">
-      <p className="text-lg font-bold">Couldn&apos;t reach YouTube Music</p>
+      <p className="text-lg font-bold">Couldn&apos;t reach the catalogue</p>
       <p className="mx-auto mt-1 max-w-sm text-[13px] text-muted">{message ?? "Something went wrong."}</p>
       {onRetry && (
         <button onClick={onRetry} className="mt-5 rounded-full bg-raised px-5 py-2 text-[13px] font-semibold transition-colors hover:bg-white/10">

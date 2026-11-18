@@ -9,7 +9,7 @@
 ╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 </pre>
 
-### *A music player for the* **YouTube Music catalog**
+### *A music player for the* **catalogue**
 
 <pre>
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -24,7 +24,6 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000.svg?style=for-the-badge&logo=nextdotjs)]()
 [![Electron](https://img.shields.io/badge/Electron-45-2b2e3a.svg?style=for-the-badge&logo=electron)]()
 [![Capacitor](https://img.shields.io/badge/Capacitor-8-119eff.svg?style=for-the-badge&logo=capacitor)]()
-[![Powered by](https://img.shields.io/badge/data-youtubei.js-f05050.svg?style=for-the-badge&logo=youtube)]()
 
 <br>
 
@@ -51,9 +50,9 @@ EVERY SURFACE, ONE CODEBASE
 
 ### What is Svara?
 
-**Svara** is an ad-light music player for the **YouTube Music catalog**. It browses the real catalogue — charts, new releases, genres and moods, albums, artists, playlists, radio and synced lyrics — inside a hand-built dark **bento** interface where the artwork carries the colour and green means "this is on".
+**Svara** is an ad-light music player for the **catalogue**. It browses the real catalogue — charts, new releases, genres and moods, albums, artists, playlists, radio and synced lyrics — inside a hand-built dark **bento** interface where the artwork carries the colour and green means "this is on".
 
-It is not a downloader and not a store. It is a player: one Zustand store owns the queue, playback talks to a hidden YouTube IFrame Player, and the UI never touches either directly.
+It is not a downloader and not a store. It is a player: one Zustand store owns the queue, playback talks to a hidden embed player, and the UI never touches either directly.
 
 > **Svara is one codebase that ships to the browser, Windows, and Android.**
 
@@ -66,13 +65,13 @@ It is not a downloader and not a store. It is a player: one Zustand store owns t
 | 🏠 | **Explore** | Hero carousel (5 slides, 7s each), charts, new releases, moods and genres. |
 | 🔍 | **Search** | Instant suggestions while typing, then songs, albums, artists and playlists. |
 | 💿 | **Collections** | Album, artist and playlist pages with full track tables and playback. |
-| 📻 | **Radio / Autoplay** | "Next" queue built from the YouTube Music radio endpoint; keeps playing when the queue ends. |
+| 📻 | **Radio / Autoplay** | "Next" queue built from the catalogue's radio endpoint; keeps playing when the queue ends. |
 | 📝 | **Lyrics** | Timed lyrics synced to the player clock. |
 | ❤️ | **Library** | Likes, recents and your own local playlists, persisted to `localStorage`. |
 | 🎛️ | **Player** | Queue, shuffle, repeat, seek, volume, marquee titles, Now Playing overlay. |
 | ⌨️ | **Keyboard-first** | Full shortcut set, no mouse required. |
 | 🪟 | **Desktop shell** | Electron window with a splash intro, dark title bar and a bundled local server. |
-| 🤖 | **Android shell** | Capacitor app with native HTTP so YouTube Music requests aren't blocked by CORS. |
+| 🤖 | **Android shell** | Capacitor app with native HTTP so catalogue requests aren't blocked by CORS. |
 
 <br>
 
@@ -80,10 +79,10 @@ It is not a downloader and not a store. It is a player: one Zustand store owns t
 
 | Layer | Where | What |
 | --- | --- | --- |
-| **Data** | `src/lib/yt.ts` | [youtubei.js](https://github.com/LuanRT/YouTube.js) talks to YouTube Music's internal API. Responses are normalised into small `Track` / `Card` / `Section` types and cached in memory. |
+| **Data** | `src/lib/yt.ts` | An in-house client talks to the catalogue's internal API. Responses are normalised into small `Track` / `Card` / `Section` types and cached in memory. |
 | **API** | `src/app/api/*` | `home`, `search`, `suggest`, `album/[id]`, `playlist/[id]`, `artist/[id]`, `next/[id]` (radio), `lyrics/[id]`, `img`. |
 | **State** | `src/lib/player.ts` | Zustand store: queue, shuffle, repeat, autoplay radio, likes, recents and local playlists. Likes, recents and playlists are saved to `localStorage`. |
-| **Playback** | `src/components/Engine.tsx` | A hidden YouTube IFrame Player. The UI talks only to the store, so this engine can be replaced without touching the UI. |
+| **Playback** | `src/components/Engine.tsx` | A hidden embed player. The UI talks only to the store, so this engine can be replaced without touching the UI. |
 | **Design** | `docs/design-system.md` | Tokens, type scale, shape, motion and component rules. |
 
 The three build targets are chosen by `SVARA_TARGET` in `next.config.ts`:
@@ -103,7 +102,7 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-YouTube often blocks requests from datacenter IPs, so run Svara locally — a hosted deploy may stop returning data.
+The catalogue's API often blocks requests from datacenter IPs, so run Svara locally — a hosted deploy may stop returning data.
 
 <br>
 
@@ -167,7 +166,7 @@ cd android && ./gradlew assembleRelease   # or bundleRelease for an .aab
 | Styling | Tailwind CSS 4 (tokens in `src/app/globals.css`) |
 | Motion | `motion` (Framer Motion) |
 | State | Zustand 5 |
-| Data | `youtubei.js` 18 |
+| Data | In-house catalogue client |
 | Desktop | Electron 45 + electron-builder 26 |
 | Mobile | Capacitor 8 (Android) |
 | Icons | lucide-react |
@@ -209,9 +208,9 @@ MIT © 2026 MrColdZs. See [LICENSE](LICENSE).
 
 ### Apa itu Svara?
 
-**Svara** adalah pemutar musik minim iklan untuk **katalog YouTube Music**. Aplikasi ini menjelajah katalog aslinya — tangga lagu, rilis baru, genre dan mood, album, artis, playlist, radio, hingga lirik — di dalam antarmuka **bento** gelap yang dibuat khusus, tempat sampul lagu yang membawa warna dan hijau berarti "sedang aktif".
+**Svara** adalah pemutar musik minim iklan untuk **katalog musik**. Aplikasi ini menjelajah katalog aslinya — tangga lagu, rilis baru, genre dan mood, album, artis, playlist, radio, hingga lirik — di dalam antarmuka **bento** gelap yang dibuat khusus, tempat sampul lagu yang membawa warna dan hijau berarti "sedang aktif".
 
-Ini bukan pengunduh dan bukan toko. Ini pemutar: satu store Zustand memegang antrean, pemutaran bicara ke YouTube IFrame Player tersembunyi, dan UI tidak pernah menyentuh keduanya secara langsung.
+Ini bukan pengunduh dan bukan toko. Ini pemutar: satu store Zustand memegang antrean, pemutaran bicara ke embed player tersembunyi, dan UI tidak pernah menyentuh keduanya secara langsung.
 
 > **Svara adalah satu basis kode yang dikirim ke browser, Windows, dan Android.**
 
@@ -224,13 +223,13 @@ Ini bukan pengunduh dan bukan toko. Ini pemutar: satu store Zustand memegang ant
 | 🏠 | **Explore** | Carousel hero (5 slide, 7 detik), tangga lagu, rilis baru, mood dan genre. |
 | 🔍 | **Pencarian** | Saran instan saat mengetik, lalu lagu, album, artis, dan playlist. |
 | 💿 | **Koleksi** | Halaman album, artis, dan playlist dengan tabel lagu lengkap dan pemutaran. |
-| 📻 | **Radio / Autoplay** | Antrean "Berikutnya" dari endpoint radio YouTube Music; terus berputar saat antrean habis. |
+| 📻 | **Radio / Autoplay** | Antrean "Berikutnya" dari endpoint radio katalog; terus berputar saat antrean habis. |
 | 📝 | **Lirik** | Lirik berwaktu yang tersinkron dengan jam pemutar. |
 | ❤️ | **Pustaka** | Suka, riwayat, dan playlist lokal, disimpan di `localStorage`. |
 | 🎛️ | **Pemutar** | Antrean, acak, ulang, geser, volume, judul berjalan, overlay Now Playing. |
 | ⌨️ | **Utamakan keyboard** | Set pintasan lengkap, tanpa perlu mouse. |
 | 🪟 | **Shell desktop** | Jendela Electron dengan intro splash, title bar gelap, dan server lokal yang dibundel. |
-| 🤖 | **Shell Android** | Aplikasi Capacitor dengan HTTP native agar permintaan YouTube Music tidak diblokir CORS. |
+| 🤖 | **Shell Android** | Aplikasi Capacitor dengan HTTP native agar permintaan katalog tidak diblokir CORS. |
 
 <br>
 
@@ -238,10 +237,10 @@ Ini bukan pengunduh dan bukan toko. Ini pemutar: satu store Zustand memegang ant
 
 | Lapisan | Lokasi | Peran |
 | --- | --- | --- |
-| **Data** | `src/lib/yt.ts` | [youtubei.js](https://github.com/LuanRT/YouTube.js) berbicara ke API internal YouTube Music. Respons dinormalkan menjadi tipe `Track` / `Card` / `Section` yang ringkas dan di-cache di memori. |
+| **Data** | `src/lib/yt.ts` | Klien internal berbicara ke API internal katalog. Respons dinormalkan menjadi tipe `Track` / `Card` / `Section` yang ringkas dan di-cache di memori. |
 | **API** | `src/app/api/*` | `home`, `search`, `suggest`, `album/[id]`, `playlist/[id]`, `artist/[id]`, `next/[id]` (radio), `lyrics/[id]`, `img`. |
 | **State** | `src/lib/player.ts` | Store Zustand: antrean, acak, ulang, radio autoplay, suka, riwayat, dan playlist lokal. Suka, riwayat, dan playlist disimpan di `localStorage`. |
-| **Pemutaran** | `src/components/Engine.tsx` | YouTube IFrame Player tersembunyi. UI hanya bicara ke store, jadi mesin ini bisa diganti tanpa menyentuh UI. |
+| **Pemutaran** | `src/components/Engine.tsx` | Embed player tersembunyi. UI hanya bicara ke store, jadi mesin ini bisa diganti tanpa menyentuh UI. |
 | **Desain** | `docs/design-system.md` | Token, skala tipografi, bentuk, gerak, dan aturan komponen. |
 
 Tiga target build dipilih lewat `SVARA_TARGET` di `next.config.ts`:
@@ -261,7 +260,7 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-YouTube sering memblokir permintaan dari IP pusat data, jadi jalankan Svara secara lokal — deploy yang di-hosting bisa berhenti mengembalikan data.
+API katalog sering memblokir permintaan dari IP pusat data, jadi jalankan Svara secara lokal — deploy yang di-hosting bisa berhenti mengembalikan data.
 
 <br>
 
@@ -325,7 +324,7 @@ cd android && ./gradlew assembleRelease   # atau bundleRelease untuk .aab
 | Styling | Tailwind CSS 4 (token di `src/app/globals.css`) |
 | Gerak | `motion` (Framer Motion) |
 | State | Zustand 5 |
-| Data | `youtubei.js` 18 |
+| Data | Klien katalog internal |
 | Desktop | Electron 45 + electron-builder 26 |
 | Mobile | Capacitor 8 (Android) |
 | Ikon | lucide-react |

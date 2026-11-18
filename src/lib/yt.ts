@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- youtubei.js node types are a large union; we normalise them defensively here. */
+/* eslint-disable @typescript-eslint/no-explicit-any -- the upstream library's node types are a large union; we normalise them defensively here. */
 import { Innertube, Parser } from "youtubei.js";
 import type {
   ArtistPage,
@@ -204,7 +204,7 @@ function toSection(shelf: any): Section | null {
 /* ---------------------------------------------------------------- queries */
 
 /**
- * Region for charts and releases. YouTube decides most of the home feed from the
+ * Region for charts and releases. The provider decides most of the home feed from the
  * caller's IP, so instead of trusting that we read the charts page for this region
  * explicitly and build the home sections from it.
  */
@@ -289,7 +289,7 @@ export const getHome = () =>
         if (sec?.chips?.length) add(sec);
       });
     }
-    if (!sections.length) throw new Error("YouTube Music returned no content");
+    if (!sections.length) throw new Error("Upstream returned no content");
     return { sections };
   });
 

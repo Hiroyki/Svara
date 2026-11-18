@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
   server: { androidScheme: "https" },
   android: { backgroundColor: "#0c0c0d" },
   plugins: {
-    // route fetch/XHR through native HTTP so YouTube Music requests aren't blocked by CORS
+    // route fetch/XHR through native HTTP so catalogue requests aren't blocked by CORS
     CapacitorHttp: { enabled: true },
   },
 };
