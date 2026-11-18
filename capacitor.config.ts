@@ -11,6 +11,8 @@ const config: CapacitorConfig = {
   plugins: {
     // route fetch/XHR through native HTTP so catalogue requests aren't blocked by CORS
     CapacitorHttp: { enabled: true },
+    // light status/navigation bar icons on the charcoal app background; the webview is inset below the bars
+    SystemBars: { style: "DARK", insetsHandling: "css" },
   },
 };
 
