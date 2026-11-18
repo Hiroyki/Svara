@@ -71,7 +71,7 @@ It is not a downloader and not a store. It is a player: one Zustand store owns t
 | 🎛️ | **Player** | Queue, shuffle, repeat, seek, volume, marquee titles, Now Playing overlay. |
 | ⌨️ | **Keyboard-first** | Full shortcut set, no mouse required. |
 | 🪟 | **Desktop shell** | Electron window with a splash intro, dark title bar and a bundled local server. |
-| 🤖 | **Android shell** | Capacitor app with native HTTP so catalogue requests aren't blocked by CORS. |
+| 🤖 | **Android app** | Capacitor app with native HTTP, keeps playing with the screen off, media notification and lock-screen / headset controls, back button that never kills the music. |
 
 <br>
 
@@ -128,7 +128,7 @@ npm run desktop:dev   # build + run the Electron app without packaging
 
 ### 🤖 Build for Android
 
-Requires a JDK and the Android SDK (`ANDROID_HOME` set). Then:
+Requires JDK 21 and the Android SDK with platform 36 (`JAVA_HOME` and `ANDROID_HOME` set). Then:
 
 ```bash
 npm run android:sync                 # static export + cap sync
@@ -229,7 +229,7 @@ Ini bukan pengunduh dan bukan toko. Ini pemutar: satu store Zustand memegang ant
 | 🎛️ | **Pemutar** | Antrean, acak, ulang, geser, volume, judul berjalan, overlay Now Playing. |
 | ⌨️ | **Utamakan keyboard** | Set pintasan lengkap, tanpa perlu mouse. |
 | 🪟 | **Shell desktop** | Jendela Electron dengan intro splash, title bar gelap, dan server lokal yang dibundel. |
-| 🤖 | **Shell Android** | Aplikasi Capacitor dengan HTTP native agar permintaan katalog tidak diblokir CORS. |
+| 🤖 | **Aplikasi Android** | Aplikasi Capacitor dengan HTTP native, tetap berputar saat layar mati, notifikasi media dan kontrol lock screen / headset, tombol Back yang tidak mematikan musik. |
 
 <br>
 
@@ -286,7 +286,7 @@ npm run desktop:dev   # build + jalankan aplikasi Electron tanpa dipaketkan
 
 ### 🤖 Build untuk Android
 
-Butuh JDK dan Android SDK (`ANDROID_HOME` diatur). Lalu:
+Butuh JDK 21 dan Android SDK dengan platform 36 (`JAVA_HOME` dan `ANDROID_HOME` diatur). Lalu:
 
 ```bash
 npm run android:sync                 # static export + cap sync
