@@ -16,8 +16,25 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Release signing. Credentials live outside the repo: SVARA_KEYSTORE_PROPERTIES, or
+    // ~/.android/svara-release.properties (storeFile, storePassword, keyAlias, keyPassword).
+    // Without that file assembleRelease still works but produces an unsigned APK.
+    def signingProps = new Properties()
+    def signingFile = file(System.getenv("SVARA_KEYSTORE_PROPERTIES") ?: "${System.getProperty('user.home')}/.android/svara-release.properties")
+    if (signingFile.exists()) signingFile.withInputStream { signingProps.load(it) }
+    signingConfigs {
+        if (signingProps.storeFile) {
+            release {
+                storeFile file(signingProps.storeFile)
+                storePassword signingProps.storePassword
+                keyAlias signingProps.keyAlias
+                keyPassword signingProps.keyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (signingProps.storeFile) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

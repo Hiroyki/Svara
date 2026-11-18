@@ -136,7 +136,7 @@ cd android && ./gradlew assembleDebug
 # APK → android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-For a release build, add a signing config in `android/app/build.gradle`, then:
+For a signed release build, put `storeFile`, `storePassword`, `keyAlias` and `keyPassword` in `~/.android/svara-release.properties` (or point `SVARA_KEYSTORE_PROPERTIES` at another file). Keep the keystore out of the repo and back it up: updates only install over an APK signed with the same key. Then:
 
 ```bash
 cd android && ./gradlew assembleRelease   # or bundleRelease for an .aab
@@ -294,7 +294,7 @@ cd android && ./gradlew assembleDebug
 # APK → android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Untuk build rilis, tambahkan konfigurasi signing di `android/app/build.gradle`, lalu:
+Untuk build rilis yang ditandatangani, isi `storeFile`, `storePassword`, `keyAlias` dan `keyPassword` di `~/.android/svara-release.properties` (atau arahkan `SVARA_KEYSTORE_PROPERTIES` ke file lain). Simpan keystore di luar repo dan backup: update hanya bisa dipasang di atas APK yang ditandatangani dengan kunci yang sama. Lalu:
 
 ```bash
 cd android && ./gradlew assembleRelease   # atau bundleRelease untuk .aab
