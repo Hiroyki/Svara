@@ -4,4 +4,9 @@
     <string name="title_activity_main">Svara</string>
     <string name="package_name">app.svara.music</string>
     <string name="custom_url_scheme">app.svara.music</string>
+    <string name="channel_playback">Playback</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_next">Next</string>
+    <string name="action_previous">Previous</string>
 </resources>

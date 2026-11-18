@@ -4,12 +4,14 @@ import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { installArtFallback } from "@/lib/art";
+import { TARGET } from "@/lib/runtime";
 import { usePlayer } from "@/lib/player";
 import { useUI } from "@/lib/ui";
 import ContextMenu from "./ContextMenu";
 import Engine from "./Engine";
 import Intro, { INTRO_MS } from "./Intro";
 import MobileNav from "./MobileNav";
+import NativeBridge from "./NativeBridge";
 import { DUR, EASE } from "./motion";
 import NowPlaying from "./NowPlaying";
 import PlayerBar from "./PlayerBar";
@@ -93,6 +95,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <Toaster />
         <Engine />
         <Shortcuts />
+        {TARGET === "android" && <NativeBridge />}
       </div>
     </MotionConfig>
   );
