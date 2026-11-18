@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/* Svara design tokens — see docs/design-system.md */
+@theme {
+  --color-app: #0c0c0d;
+  --color-panel: #1b1b1d;
+  --color-raised: #262629;
+  --color-hover: rgb(255 255 255 / 0.045);
+  --color-line: rgb(255 255 255 / 0.07);
+  --color-ink: #f4f4f5;
+  --color-muted: #a1a1aa;
+  --color-faint: #6f6f78;
+  --color-green: #3ddc6b;
+  --color-green-soft: rgb(61 220 107 / 0.12);
+  --color-lime: #c2f25c;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-eq: eq 0.9s ease-in-out infinite;
+  --animate-in: enter 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pop: pop 0.15s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+
+  @keyframes eq {
+    0%, 100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes enter {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-app);
+  color: var(--color-ink);
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-green);
+  color: #0c0c0d;
+}
+
+/* in the base layer so components can opt out (e.g. the search field styles its own focus) */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-green);
+    outline-offset: 2px;
+  }
+  /* key caps use the UI face, not the browser's monospace */
+  kbd {
+    font-family: var(--font-sans);
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.1) transparent;
+}
+
+/* range input used for volume */
+input[type="range"].svara-range {
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-ink) var(--fill, 50%), rgb(255 255 255 / 0.15) var(--fill, 50%));
+  cursor: pointer;
+}
+input[type="range"].svara-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+input[type="range"].svara-range:hover::-webkit-slider-thumb,
+input[type="range"].svara-range:focus-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+input[type="range"].svara-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+}
+
+/* hero carousel progress segment */
+@keyframes grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+/* referenced from a class so the build keeps the keyframes */
+.grow-bar {
+  transform-origin: left;
+  animation: grow var(--grow-dur, 7s) linear forwards;
+}
+
+/* long titles drift back and forth; --shift is set from the measured overflow */
+@keyframes marquee {
+  0%, 18% { transform: translateX(0); }
+  82%, 100% { transform: translateX(var(--shift, 0px)); }
+}
+.marquee {
+  animation: marquee var(--marquee-dur, 8s) ease-in-out infinite alternate;
+}
+
+/* ambient glow behind now-playing artwork */
+@keyframes breathe {
+  0%, 100% { transform: scale(0.92); opacity: 0.45; }
+  50% { transform: scale(1.02); opacity: 0.75; }
+}
+.breathe {
+  animation: breathe 6s ease-in-out infinite;
+}
+
+/* vinyl record spinning behind the now-playing cover */
+@keyframes vinyl-rot {
+  to { transform: rotate(360deg); }
+}
+.vinyl {
+  animation: vinyl-rot 3.6s linear infinite;
+}
+
+/* fake spectrum bars in the Now Playing view */
+@keyframes viz {
+  0%, 100% { transform: scaleY(0.15); }
+  50% { transform: scaleY(1); }
+}
+.viz-bar {
+  transform-origin: bottom;
+  animation: viz var(--viz-dur, 1s) ease-in-out infinite;
+  animation-delay: var(--viz-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl,
+  .viz-bar,
+  .marquee,
+  .breathe {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
