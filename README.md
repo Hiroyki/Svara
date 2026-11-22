@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo.png" width="96" alt="Svara logo">
+<img src="assets/logo.png" width="104" alt="Svara logo">
 
 <pre>
 ███████╗██╗   ██╗ █████╗ ██████╗  █████╗
@@ -13,232 +13,229 @@
 
 ### *Feel every note.*
 
-An ad-free music player for the YouTube Music catalogue: lyrics, crossfade, EQ, podcasts and offline saving.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-ffc94a.svg?style=for-the-badge)](LICENSE)
-[![Version](https://img.shields.io/github/v/release/Hiroyki/Svara?style=for-the-badge&color=ff7a6b&label=version)](https://github.com/Hiroyki/Svara/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-windows_·_macOS_·_web-b69cff.svg?style=for-the-badge)](#-download)
+**An ad-free desktop music player for the YouTube Music catalogue.**
+<br>
+Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listening Recap
 
 <br>
 
-[![Download for Windows](https://img.shields.io/badge/Download-Windows_installer-0078d4.svg?style=for-the-badge&logo=windows)](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe)
-&nbsp;
-[![Download for macOS](https://img.shields.io/badge/Download-macOS_.dmg-111111.svg?style=for-the-badge&logo=apple)](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg)
+[![Release](https://img.shields.io/github/v/release/Hiroyki/Svara?style=for-the-badge&color=ffc94a&label=release)](https://github.com/Hiroyki/Svara/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Hiroyki/Svara/total?style=for-the-badge&color=ff7a6b)](https://github.com/Hiroyki/Svara/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows_·_macOS-b69cff.svg?style=for-the-badge)](#-download)
+[![License: MIT](https://img.shields.io/badge/License-MIT-3ddc6b.svg?style=for-the-badge)](LICENSE)
 
 <br>
 
-**[🇺🇸 English](#-english)** &nbsp;·&nbsp; **[🇮🇩 Bahasa Indonesia](#-bahasa-indonesia)**
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe"><img src="https://img.shields.io/badge/Download_for-Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white" height="42" alt="Download for Windows"></a>
+&nbsp;&nbsp;
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg"><img src="https://img.shields.io/badge/Download_for-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" height="42" alt="Download for macOS"></a>
+
+<sub>Windows 10/11 64-bit · macOS 13+ (Apple Silicon & Intel) · nothing else to install</sub>
+
+<br><br>
+
+<img src="docs/screenshot.png" width="900" alt="Svara: home, queue and player">
 
 <br>
 
-<img src="docs/screenshot.png" width="860" alt="Svara home screen">
+| 🚫 **No ads** | 📝 **Karaoke lyrics** | 🎛️ **EQ + crossfade** | 💾 **Offline songs** | 🔒 **No account** |
+| :---: | :---: | :---: | :---: | :---: |
+| Just the music | Synced line by line | Gapless, 5-band | Saved to your disk | Everything stays local |
 
 </div>
 
 ---
 
-## 🇺🇸 English
+## 🎧 What is Svara?
 
-### What is Svara?
+**Svara** is a music player for your computer that plays the whole YouTube Music catalogue without ads. Charts, moods, albums, artists, playlists and endless radio mixes, with lyrics that light up as the song plays, a proper equalizer, crossfade between songs, podcasts, and songs you can save to listen offline.
 
-**Svara** is a personal music player that plays the YouTube Music catalogue without ads. You get the real catalogue (charts, moods, albums, artists, playlists, radio mixes), synced karaoke lyrics, a 5-band equalizer, crossfade, podcasts, and songs you can save for offline listening.
+There's no sign-up and no cloud: your library, playlists and listening history live on your own computer.
 
-It runs as a small local server (Python + [yt-dlp](https://github.com/yt-dlp/yt-dlp)) with a hand-built web interface on top. On Windows and macOS that interface lives in a native app window, so it behaves like any other music app.
+## 📥 Download
 
-### 📥 Download
+| | Platform | File | Size |
+| :---: | --- | --- | --- |
+| 🪟 | **Windows 10 / 11** (64-bit) | [**Svara-Setup-2.0.0.exe**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe) | ~100 MB |
+| 🍎 | **macOS 13 Ventura or newer** (Apple Silicon & Intel) | [**Svara-2.0.0.dmg**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | ~250 MB |
 
-| Platform | File | Notes |
-| --- | --- | --- |
-| 🪟 **Windows 10/11** (64-bit) | [`Svara-Setup-2.0.0.exe`](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe) | Click through the setup wizard. Everything is bundled. |
-| 🍎 **macOS 13+** (Apple Silicon & Intel) | [`Svara-2.0.0.dmg`](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | Drag to Applications. Needs `yt-dlp` and `ffmpeg` (see below). |
+Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno and ffmpeg) is already inside. No Homebrew, no Terminal, no extra installs.
 
-All releases: **[github.com/Hiroyki/Svara/releases](https://github.com/Hiroyki/Svara/releases)**
+<details open>
+<summary><b>🪟 Installing on Windows</b></summary>
 
-#### Windows
+<br>
 
-1. Run `Svara-Setup-2.0.0.exe` and click **Next → Next → Install → Finish**.
-2. No admin rights needed: Svara installs for your user only and adds a Start menu entry (plus a desktop shortcut if you leave the box ticked).
-3. Python, yt-dlp, Deno and ffmpeg ship inside the app, so there's nothing else to install.
+1. Run **`Svara-Setup-2.0.0.exe`**.
+2. Click **Next → Next → Install → Finish**. That's it.
+3. Svara opens on its own (leave *Run Svara* ticked) and appears in the Start menu, plus a desktop shortcut if you want one.
 
-> The installer isn't code-signed yet. If SmartScreen says *"Windows protected your PC"*, click **More info → Run anyway**.
->
-> To uninstall: **Settings → Apps → Svara → Uninstall**. It asks whether to keep your library for a later reinstall.
+- No admin rights needed: it installs for your user only.
+- If SmartScreen shows *"Windows protected your PC"*, click **More info → Run anyway**. The installer just isn't code-signed yet.
+- Uninstall from **Settings → Apps → Svara**. It asks whether to keep your library for a later reinstall.
 
-#### macOS
+</details>
 
-1. Install the helpers once with [Homebrew](https://brew.sh):
-   ```sh
-   brew install yt-dlp ffmpeg deno
-   ```
-2. Open `Svara-2.0.0.dmg` and drag **Svara** into **Applications**.
-3. The app isn't notarised yet, so the first launch needs one extra step: **right-click Svara → Open → Open**.
-   If macOS still blocks it, go to **System Settings → Privacy & Security → Open Anyway**, or run:
-   ```sh
-   xattr -dr com.apple.quarantine /Applications/Svara.app
-   ```
+<details open>
+<summary><b>🍎 Installing on macOS</b></summary>
 
-Closing the window keeps the music playing; quit with **⌘Q**.
+<br>
 
-### ✨ Features
+1. Open **`Svara-2.0.0.dmg`** and drag **Svara** onto **Applications**.
+2. Open Svara from Applications.
+3. The first time, macOS may say it can't verify the developer (Svara isn't notarised by Apple yet). Go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only do this once.
 
-| | Feature | What it does |
-| --- | --- | --- |
-| 🏠 | **Adaptive home** | Daily mix, "continue listening", mood cards and recommendations for your country. |
-| 🔍 | **Search** | Songs, albums, artists, playlists and podcasts. |
-| ⏭️ | **Up Next** | Endless radio mix with mood chips, smart shuffle, and saving the queue as a playlist. |
-| 📝 | **Lyrics** | Time-synced karaoke lyrics in a side panel or full screen. |
-| 🎛️ | **Sound** | Gapless crossfade, 5-band equalizer and a live spectrum visualizer. |
-| 💾 | **Offline** | Save songs to disk (via ffmpeg) and play them without a connection. |
-| 🎙️ | **Podcasts** | Subscribe to RSS feeds and play episodes. |
-| 📊 | **Svara Recap** | Listening stats for 7 days, 30 days or all time: minutes, top songs, artists, streaks. |
-| 📸 | **Story cards** | Share a 1080×1920 card of the current song (with a lyric line) or your Recap. Uses the native share sheet on macOS. |
-| 🪟 | **Mini player** | Floating picture-in-picture player, plus a sleep timer. |
-| 🌗 | **Themes** | Light and dark themes that follow your system. |
-| ⌨️ | **Keyboard-first** | Full shortcut set (press <kbd>?</kbd> in the app). |
+- Closing the window keeps the music playing. Quit with **⌘Q**.
+- Still blocked? Run this once in Terminal: `xattr -dr com.apple.quarantine /Applications/Svara.app`
 
-### ⌨️ Shortcuts
+</details>
 
-| Key | Action |
+## ✨ Features
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 🎧 Listen
+- **Endless Up Next**: radio mixes from any song, with mood chips
+- **Smart shuffle** slips in similar songs
+- **Gapless crossfade** between tracks
+- **5-band equalizer** and live spectrum visualizer
+- **Karaoke lyrics**, synced line by line
+- **Mini player** that floats over other windows
+- **Sleep timer**
+
+</td>
+<td width="33%" valign="top">
+
+### 🔍 Discover
+- **Adaptive home**: daily mix, "continue listening", recommendations for your country
+- **Mood cards**: Galau, Santai sore, Indie Indonesia, Lo-fi, Dangdut koplo, K-pop…
+- **Search** songs, albums, artists, playlists and podcasts
+- **Album, artist and playlist pages**
+- **Podcasts**: subscribe and play episodes
+
+</td>
+<td width="33%" valign="top">
+
+### 💛 Yours
+- **Library**: liked songs, playlists, albums, artists
+- **Save the queue** as a playlist in one click
+- **Offline songs** saved to your Music folder
+- **Svara Recap**: minutes listened, top songs and artists, streaks
+- **Story cards** to share what you're playing
+- **Light & dark** themes that follow your system
+
+</td>
+</tr>
+</table>
+
+## 📸 Story cards
+
+Share what you're listening to as a 1080×1920 card, ready for Instagram or WhatsApp stories. The card takes its colours from the album art, adds the lyric line you're on, and shows how far into the song you are. On macOS it opens the native share sheet (AirDrop, Messages, Photos…); you can also save or copy the image.
+
+<div align="center">
+<img src="docs/story-1.jpg" width="260" alt="Story card example">
+&nbsp;&nbsp;&nbsp;
+<img src="docs/story-2.jpg" width="260" alt="Story card example">
+</div>
+
+## ⌨️ Keyboard shortcuts
+
+| Key | Action | Key | Action |
+| --- | --- | --- | --- |
+| <kbd>Space</kbd> | Play / pause | <kbd>L</kbd> | Lyrics |
+| <kbd>→</kbd> <kbd>←</kbd> | Seek ±10 s | <kbd>M</kbd> | Mute |
+| <kbd>⇧</kbd> <kbd>→</kbd> <kbd>←</kbd> | Next / previous song | <kbd>E</kbd> | Sound & equalizer |
+| <kbd>↑</kbd> <kbd>↓</kbd> | Volume | <kbd>P</kbd> | Mini player |
+| <kbd>⌘K</kbd> / <kbd>/</kbd> | Search | <kbd>?</kbd> | All shortcuts |
+
+## 🔒 Privacy
+
+- **No account, no sign-in.** Svara never asks for your Google login.
+- **No ads, no tracking, no analytics.**
+- Your library, playlists, history and Recap are stored **only on your computer**.
+- The app talks to a small server that runs **on your own machine**, which fetches the catalogue, lyrics and audio for you.
+
+## ❓ FAQ
+
+<details>
+<summary><b>Is it free?</b></summary>
+<br>
+Yes. Svara is free and open source under the MIT license.
+</details>
+
+<details>
+<summary><b>Do I need a YouTube or YouTube Music account?</b></summary>
+<br>
+No. Svara works without signing in to anything.
+</details>
+
+<details>
+<summary><b>Where do saved (offline) songs go?</b></summary>
+<br>
+Into <code>Music/Senandung</code> in your home folder, as normal audio files you can also play elsewhere.
+</details>
+
+<details>
+<summary><b>How do I update?</b></summary>
+<br>
+Download the newest installer from <a href="https://github.com/Hiroyki/Svara/releases">Releases</a> and install over the old one. Your library stays.
+</details>
+
+<details>
+<summary><b>A song won't play. What now?</b></summary>
+<br>
+YouTube changes things from time to time; a newer Svara release usually fixes it. On macOS the log lives at <code>~/Library/Logs/Svara.log</code>, on Windows at <code>%LOCALAPPDATA%\Senandung\senandung.log</code>. Please attach it when you open an issue.
+</details>
+
+## 🔧 How it works
+
+```
+┌──────────────────── Svara app window ────────────────────┐
+│   macOS: Swift + WKWebView     Windows: Go + WebView2    │
+│   ┌──────────── interface (HTML · CSS · JS) ───────────┐ │
+│   │  index.html · app.js · style.css · db.js (library) │ │
+│   └─────────────────────────┬──────────────────────────┘ │
+└─────────────────────────────┼────────────────────────────┘
+                              │  127.0.0.1:5560 (your machine only)
+              ┌───────────────┴───────────────┐
+              │  server.py (bundled Python)   │──► yt-dlp + Deno  → catalogue & audio
+              │  lyrics · images · podcasts   │──► ffmpeg         → offline songs
+              └───────────────────────────────┘──► RSS            → podcasts
+```
+
+<details>
+<summary><b>🛠️ Build it yourself</b></summary>
+
+<br>
+
+Both apps are built from a Mac:
+
+```sh
+./build-mac.sh       # → dist/Svara.app + dist/Svara-<version>.dmg
+./build-windows.sh   # → dist-windows/Svara.exe + dist-windows/Svara-Setup-<version>.exe
+```
+
+You'll need the Xcode command line tools and `brew install uv go makensis`, plus Pillow (`pip3 install pillow`). The scripts download Python, yt-dlp, Deno and ffmpeg for each platform and pack them into the app.
+
+| Path | What |
 | --- | --- |
-| <kbd>Space</kbd> | Play / pause |
-| <kbd>→</kbd> / <kbd>←</kbd> | Seek ±10 s |
-| <kbd>⇧</kbd>+<kbd>→</kbd> / <kbd>⇧</kbd>+<kbd>←</kbd> | Next / previous song |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Volume |
-| <kbd>L</kbd> | Lyrics |
-| <kbd>M</kbd> | Mute |
-| <kbd>E</kbd> | Sound & equalizer |
-| <kbd>P</kbd> | Mini player |
-| <kbd>⌘K</kbd> or <kbd>/</kbd> | Search |
-| <kbd>?</kbd> | Show all shortcuts |
+| `index.html` · `app.js` · `style.css` · `db.js` | The interface (no framework, no build step) |
+| `server.py` · `ytworker.py` | Local server and always-warm yt-dlp workers |
+| `mac/main.swift` | macOS app: window, menus, server lifecycle, native share sheet |
+| `windows/` | Windows app (Go + WebView2) and the NSIS installer |
 
-### 🔧 How it works
-
-```
-┌──────────────── native window ────────────────┐
-│  macOS: Swift + WKWebView                     │
-│  Windows: Go + WebView2                       │
-│  ┌──────────── web UI (vanilla JS) ─────────┐ │
-│  │ index.html · app.js · style.css · db.js │ │
-│  └──────────────────┬───────────────────────┘ │
-└─────────────────────┼─────────────────────────┘
-                      │ http://127.0.0.1:5560
-          ┌───────────┴───────────┐
-          │ server.py (Python)    │──► yt-dlp workers (ytworker.py)
-          │ catalogue · streams   │──► ffmpeg (offline saving)
-          │ lyrics · podcasts     │──► RSS feeds
-          └───────────────────────┘
-```
-
-| Piece | What |
-| --- | --- |
-| `index.html`, `app.js`, `style.css` | The whole interface: no framework, no build step. |
-| `db.js` | IndexedDB storage for your library, history and queue. |
-| `server.py` | Local server: serves the UI and bridges the catalogue, audio streams, lyrics, images and podcasts. |
-| `ytworker.py` | Long-running yt-dlp workers, so the next song resolves in about a second. |
-| `mac/main.swift` | macOS app: window, menu, server lifecycle and the native share bridge. |
-| `windows/` | Windows app (Go + WebView2) with Python, yt-dlp, Deno and ffmpeg embedded, plus the NSIS installer. |
-
-### 🛠️ Build from source
-
-Run it in the browser (any OS with Python 3.9+, `yt-dlp` and `ffmpeg`):
-
-```sh
-python3 server.py          # then open http://localhost:5560
-```
-
-Build the apps (on a Mac):
-
-```sh
-./build-mac.sh             # → dist/Svara.app + dist/Svara-<version>.dmg (also installs to ~/Applications)
-./build-windows.sh         # → dist-windows/Svara.exe + dist-windows/Svara-Setup-<version>.exe
-```
-
-`build-mac.sh` needs the Xcode command line tools and Pillow (`pip3 install pillow`).
-`build-windows.sh` cross-compiles from macOS and needs `go`, `uv`, `makensis` and Pillow (`brew install go uv makensis`).
-
----
-
-## 🇮🇩 Bahasa Indonesia
-
-### Svara itu apa?
-
-**Svara** itu pemutar musik pribadi buat katalog YouTube Music, tanpa iklan. Isinya katalog beneran (chart, mood, album, artis, playlist, mix radio), lirik karaoke yang jalan bareng lagu, equalizer 5 band, crossfade, podcast, dan lagu yang bisa disimpan buat didengerin offline.
-
-Di baliknya ada server lokal kecil (Python + [yt-dlp](https://github.com/yt-dlp/yt-dlp)), di atasnya tampilan web yang dibikin sendiri. Di Windows dan macOS tampilannya dibungkus jendela app native, jadi rasanya kayak app musik biasa.
-
-### 📥 Download
-
-| Platform | File | Catatan |
-| --- | --- | --- |
-| 🪟 **Windows 10/11** (64-bit) | [`Svara-Setup-2.0.0.exe`](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe) | Tinggal Next-Next. Semua udah dibundel. |
-| 🍎 **macOS 13+** (Apple Silicon & Intel) | [`Svara-2.0.0.dmg`](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | Seret ke Applications. Butuh `yt-dlp` dan `ffmpeg` (lihat di bawah). |
-
-#### Windows
-
-1. Jalanin `Svara-Setup-2.0.0.exe`, klik **Next → Next → Install → Finish**.
-2. Nggak perlu admin: Svara dipasang buat user kamu aja, muncul di Start menu (plus shortcut desktop kalau centangnya dibiarin).
-3. Python, yt-dlp, Deno, dan ffmpeg udah ikut di dalam app, jadi nggak ada yang perlu dipasang lagi.
-
-> Installer-nya belum ditandatangani (code-sign). Kalau SmartScreen bilang *"Windows protected your PC"*, klik **More info → Run anyway**.
->
-> Buat uninstall: **Settings → Apps → Svara → Uninstall**. Nanti ditanya mau nyimpen koleksi kamu atau nggak.
-
-#### macOS
-
-1. Pasang pembantunya sekali lewat [Homebrew](https://brew.sh):
-   ```sh
-   brew install yt-dlp ffmpeg deno
-   ```
-2. Buka `Svara-2.0.0.dmg`, seret **Svara** ke **Applications**.
-3. App-nya belum dinotarisasi Apple, jadi pas pertama dibuka: **klik kanan Svara → Open → Open**.
-   Kalau masih diblokir, buka **System Settings → Privacy & Security → Open Anyway**, atau jalanin:
-   ```sh
-   xattr -dr com.apple.quarantine /Applications/Svara.app
-   ```
-
-Nutup jendela nggak bikin musik berhenti; keluar beneran pakai **⌘Q**.
-
-### ✨ Fitur
-
-| | Fitur | Gunanya |
-| --- | --- | --- |
-| 🏠 | **Beranda adaptif** | Mix harian, lanjutin dengerin, kartu mood, rekomendasi sesuai negara. |
-| 🔍 | **Cari** | Lagu, album, artis, playlist, dan podcast. |
-| ⏭️ | **Berikutnya** | Mix radio tanpa ujung, chip suasana, smart shuffle, simpan antrean jadi playlist. |
-| 📝 | **Lirik** | Lirik karaoke yang jalan bareng lagu, di panel samping atau layar penuh. |
-| 🎛️ | **Suara** | Crossfade tanpa jeda, equalizer 5 band, visualizer spektrum. |
-| 💾 | **Offline** | Simpan lagu ke disk (pakai ffmpeg), putar tanpa internet. |
-| 🎙️ | **Podcast** | Langganan feed RSS dan putar episodenya. |
-| 📊 | **Svara Recap** | Statistik dengerin 7 hari, 30 hari, atau sepanjang masa: menit, top lagu, artis, hari beruntun. |
-| 📸 | **Kartu story** | Bagikan kartu 1080×1920 lagu yang lagi diputar (plus potongan lirik) atau Recap kamu. Di macOS pakai share sheet bawaan. |
-| 🪟 | **Mini player** | Player melayang (picture-in-picture) dan timer tidur. |
-| 🌗 | **Tema** | Terang dan gelap, ngikutin sistem. |
-| ⌨️ | **Keyboard** | Shortcut lengkap (tekan <kbd>?</kbd> di app). |
-
-### 🛠️ Build sendiri
-
-Jalanin di browser (OS apa aja yang ada Python 3.9+, `yt-dlp`, dan `ffmpeg`):
-
-```sh
-python3 server.py          # terus buka http://localhost:5560
-```
-
-Bikin app-nya (dari Mac):
-
-```sh
-./build-mac.sh             # → dist/Svara.app + dist/Svara-<versi>.dmg (sekalian dipasang ke ~/Applications)
-./build-windows.sh         # → dist-windows/Svara.exe + dist-windows/Svara-Setup-<versi>.exe
-```
-
-`build-mac.sh` butuh Xcode command line tools dan Pillow (`pip3 install pillow`).
-`build-windows.sh` di-cross-compile dari macOS, butuh `go`, `uv`, `makensis`, dan Pillow (`brew install go uv makensis`).
+</details>
 
 ---
 
 <div align="center">
 
-**MIT License** · Svara is not affiliated with YouTube or Google. For personal use.
-<br>
-*Svara nggak ada hubungannya sama YouTube atau Google. Buat dipakai pribadi.*
+<img src="assets/logo.png" width="40" alt="">
+
+**Svara** · MIT License
+
+<sub>Svara is not affiliated with YouTube or Google. For personal use.</sub>
 
 </div>

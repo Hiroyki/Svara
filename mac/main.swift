@@ -126,13 +126,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
     func launchServer() {
         guard let dir = Bundle.main.resourceURL?.appendingPathComponent("web") else { return }
         let p = Process()
-        p.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
         p.arguments = ["server.py"]
         p.currentDirectoryURL = dir
         var env = ProcessInfo.processInfo.environment
-        // App dari Finder nggak bawa PATH Homebrew; yt-dlp, ffmpeg, deno ada di sana
-        env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        let sysPath = "/usr/bin:/bin:/usr/sbin:/sbin"
         env["PUTAR_PORT"] = String(port)
+
+        if let rt = bundledRuntime {
+            // Python, yt-dlp, deno, ffmpeg ikut di dalam app: nggak perlu Homebrew
+            let py = rt.appendingPathComponent("python/bin/python3")
+            p.executableURL = py
+            env["PUTAR_PYTHON"] = py.path
+            env["PATH"] = rt.appendingPathComponent("bin").path + ":" + sysPath
+            env["PYTHONDONTWRITEBYTECODE"] = "1"
+            env["PYTHONNOUSERSITE"] = "1"
+            // OpenSSL Python portabel nggak tahu lokasi sertifikat sistem; pakai punya certifi
+            let certs = rt.appendingPathComponent("python/lib/python3.13/site-packages/certifi/cacert.pem")
+            if FileManager.default.fileExists(atPath: certs.path) { env["SSL_CERT_FILE"] = certs.path }
+        } else {
+            // Build dev tanpa runtime: pakai Python sistem + yt-dlp/ffmpeg/deno dari Homebrew
+            p.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+            env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:" + sysPath
+        }
         p.environment = env
         let log = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/Svara.log")
         FileManager.default.createFile(atPath: log.path, contents: nil)
@@ -142,6 +157,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
         }
         try? p.run()
         server = p
+    }
+
+    /// Runtime bawaan sesuai arsitektur Mac ini (Resources/runtime/arm64 atau x86_64).
+    var bundledRuntime: URL? {
+        #if arch(arm64)
+        let arch = "arm64"
+        #else
+        let arch = "x86_64"
+        #endif
+        guard let rt = Bundle.main.resourceURL?.appendingPathComponent("runtime/\(arch)") else { return nil }
+        guard FileManager.default.isExecutableFile(atPath: rt.appendingPathComponent("python/bin/python3").path) else { return nil }
+        // App hasil download masih ditandai "karantina"; kalau dibiarin, macOS bisa nahan
+        // python/deno/ffmpeg di dalamnya. Setelah app-nya sendiri diizinin, tandanya dibuang.
+        let x = Process()
+        x.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
+        x.arguments = ["-dr", "com.apple.quarantine", rt.path]
+        x.standardOutput = FileHandle.nullDevice
+        x.standardError = FileHandle.nullDevice
+        if (try? x.run()) != nil { x.waitUntilExit() }
+        return rt
     }
 
     func waitForServer(tries: Int, done: @escaping (Bool) -> Void) {
@@ -230,7 +265,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
     static let errorHTML = """
     <html><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0b0b0f;color:#efedf5;font:15px -apple-system,sans-serif">
     <div style="max-width:420px;text-align:center;line-height:1.5"><b style="font-size:18px">Server Svara gagal nyala</b>
-    <p style="color:#a29fb2">Pastikan yt-dlp sama ffmpeg udah terpasang (brew install yt-dlp ffmpeg), terus buka ulang app-nya.
+    <p style="color:#a29fb2">Coba tutup (⌘Q) terus buka ulang app-nya. Kalau masih gagal, cek koneksi internet.
     Catatan error ada di ~/Library/Logs/Svara.log</p></div></body></html>
     """
 }

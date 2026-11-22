@@ -1,4 +1,4 @@
-; Installer Svara buat Windows (wizard Next → Next → Install → Finish).
+; Svara Windows installer (Next → Next → Install → Finish wizard).
 ; Dibikin dari Mac: makensis -DVERSION=2.0.0 windows/installer.nsi  (dipanggil build-windows.sh)
 ; Pasang per-user ke %LOCALAPPDATA%\Programs\Svara, jadi nggak perlu izin admin.
 
@@ -55,12 +55,9 @@ VIAddVersionKey "LegalCopyright" "MIT License"
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "English"
-!insertmacro MUI_LANGUAGE "Indonesian"
 
 LangString DesktopShortcut ${LANG_ENGLISH} "Create a desktop shortcut"
-LangString DesktopShortcut ${LANG_INDONESIAN} "Bikin shortcut di desktop"
 LangString RemoveData ${LANG_ENGLISH} "Also delete Svara's data (library, history, cache)?$\r$\nChoose No to keep it for a later reinstall."
-LangString RemoveData ${LANG_INDONESIAN} "Hapus juga data Svara (koleksi, riwayat, cache)?$\r$\nPilih Tidak kalau mau dipakai lagi pas instal ulang."
 
 Function CreateDesktopShortcut
   CreateShortcut "$DESKTOP\${APP}.lnk" "$INSTDIR\${EXE}"
