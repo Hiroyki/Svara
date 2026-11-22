@@ -15,6 +15,7 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 [![Platform](https://img.shields.io/badge/platform-Windows_·_macOS-b69cff.svg?style=for-the-badge)](#-download)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ddc6b.svg?style=for-the-badge)](LICENSE)
 <br>
+[![Build](https://img.shields.io/github/actions/workflow/status/Hiroyki/Svara/ci.yml?branch=main&style=flat-square&label=build&labelColor=1a1922)](https://github.com/Hiroyki/Svara/actions/workflows/ci.yml)
 [![Stars](https://img.shields.io/github/stars/Hiroyki/Svara?style=flat-square&color=ffc94a&labelColor=1a1922)](https://github.com/Hiroyki/Svara/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/Hiroyki/Svara?style=flat-square&color=ff7a6b&labelColor=1a1922)](https://github.com/Hiroyki/Svara/commits/main)
 [![Issues](https://img.shields.io/github/issues/Hiroyki/Svara?style=flat-square&color=b69cff&labelColor=1a1922)](https://github.com/Hiroyki/Svara/issues)
@@ -44,6 +45,13 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 </div>
 
 ---
+
+## 🎬 See it in action
+
+<div align="center">
+<img src="docs/demo.gif" width="880" alt="Svara demo: playing a mix, karaoke lyrics, artist page and light theme">
+<br><sub>Playing a mix → karaoke lyrics → artist page → light theme</sub>
+</div>
 
 ## 🎧 What is Svara?
 
@@ -248,6 +256,23 @@ You'll need the Xcode command line tools and `brew install uv go makensis`, plus
 | `windows/` | Windows app (Go + WebView2) and the NSIS installer |
 
 </details>
+
+## 🤝 Contributing
+
+Bug reports, ideas and pull requests are welcome! Have a look at [CONTRIBUTING.md](CONTRIBUTING.md) for how to run Svara from source, or start a chat in [Discussions](https://github.com/Hiroyki/Svara/discussions).
+
+If Svara makes your day sound better, a ⭐ helps other people find it.
+
+<div align="center">
+
+<a href="https://star-history.com/#Hiroyki/Svara&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hiroyki/Svara&type=Date&theme=dark">
+    <img src="https://api.star-history.com/svg?repos=Hiroyki/Svara&type=Date" width="600" alt="Star history">
+  </picture>
+</a>
+
+</div>
 
 ---
 

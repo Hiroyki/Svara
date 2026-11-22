@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  interface:
+    name: Interface & server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: for f in app.js db.js sw.js; do node --check "$f"; done
+      - name: Check Python syntax
+        run: python3 -m py_compile server.py ytworker.py
+
+  windows:
+    name: Windows app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: windows/go.mod
+          cache-dependency-path: windows/go.sum
+      - name: Test
+        working-directory: windows
+        run: go test ./...
+      - name: Build for Windows
+        working-directory: windows
+        run: |
+          # The real payload (Python, yt-dlp, Deno, ffmpeg) is assembled by build-windows.sh; a stub is enough to compile
+          echo ci > payload.id
+          (cd "$RUNNER_TEMP" && echo ci > stub.txt && zip -q payload.zip stub.txt)
+          cp "$RUNNER_TEMP/payload.zip" .
+          GOOS=windows GOARCH=amd64 go vet ./...
+          GOOS=windows GOARCH=amd64 go build -o "$RUNNER_TEMP/Svara.exe" .
+
+  macos:
+    name: macOS app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build universal binary
+        run: |
+          for arch in arm64 x86_64; do
+            swiftc -O -target $arch-apple-macos13 mac/main.swift -o "$RUNNER_TEMP/Svara-$arch" -framework Cocoa -framework WebKit
+          done
+          lipo -create "$RUNNER_TEMP/Svara-arm64" "$RUNNER_TEMP/Svara-x86_64" -output "$RUNNER_TEMP/Svara"
+          lipo -archs "$RUNNER_TEMP/Svara"
