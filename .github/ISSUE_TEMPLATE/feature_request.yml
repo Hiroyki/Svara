@@ -1,0 +1,16 @@
+name: ✨ Feature request
+description: Suggest an idea to make Svara better
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like Svara to do?
+      placeholder: It would be great if I could…
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help you?
+      description: Tell us how you'd use it. This helps us get it right.

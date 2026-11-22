@@ -1,17 +1,8 @@
 <div align="center">
 
-<img src="assets/logo.png" width="104" alt="Svara logo">
+<img src="docs/banner.svg" width="100%" alt="Svara: feel every note">
 
-<pre>
-███████╗██╗   ██╗ █████╗ ██████╗  █████╗
-██╔════╝██║   ██║██╔══██╗██╔══██╗██╔══██╗
-███████╗██║   ██║███████║██████╔╝███████║
-╚════██║╚██╗ ██╔╝██╔══██║██╔══██╗██╔══██║
-███████║ ╚████╔╝ ██║  ██║██║  ██║██║  ██║
-╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
-</pre>
-
-### *Feel every note.*
+<br>
 
 **An ad-free desktop music player for the YouTube Music catalogue.**
 <br>
@@ -23,6 +14,14 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 [![Downloads](https://img.shields.io/github/downloads/Hiroyki/Svara/total?style=for-the-badge&color=ff7a6b)](https://github.com/Hiroyki/Svara/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows_·_macOS-b69cff.svg?style=for-the-badge)](#-download)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ddc6b.svg?style=for-the-badge)](LICENSE)
+<br>
+[![Stars](https://img.shields.io/github/stars/Hiroyki/Svara?style=flat-square&color=ffc94a&labelColor=1a1922)](https://github.com/Hiroyki/Svara/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/Hiroyki/Svara?style=flat-square&color=ff7a6b&labelColor=1a1922)](https://github.com/Hiroyki/Svara/commits/main)
+[![Issues](https://img.shields.io/github/issues/Hiroyki/Svara?style=flat-square&color=b69cff&labelColor=1a1922)](https://github.com/Hiroyki/Svara/issues)
+![Swift](https://img.shields.io/badge/Swift-macOS-f05138?style=flat-square&logo=swift&logoColor=white&labelColor=1a1922)
+![Go](https://img.shields.io/badge/Go-Windows-00add8?style=flat-square&logo=go&logoColor=white&labelColor=1a1922)
+![Python](https://img.shields.io/badge/Python-server-3776ab?style=flat-square&logo=python&logoColor=white&labelColor=1a1922)
+![JavaScript](https://img.shields.io/badge/JavaScript-UI-f7df1e?style=flat-square&logo=javascript&logoColor=black&labelColor=1a1922)
 
 <br>
 
@@ -90,6 +89,32 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 
 </details>
 
+## 🖼️ Screenshots
+
+<div align="center">
+
+<img src="docs/now-playing.jpg" width="900" alt="Now Playing with synced karaoke lyrics">
+<br><sub><b>Now Playing</b> with karaoke lyrics that follow the song</sub>
+
+<br><br>
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/home-dark.jpg" alt="Home while a mix is playing"><br><sub><b>Home</b>: what's playing, the next lyric line, and your mix</sub></td>
+<td align="center" width="50%"><img src="docs/home-light.jpg" alt="Light theme"><br><sub><b>Light theme</b>, following your system</sub></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/artist.jpg" alt="Artist page"><br><sub><b>Artist pages</b> with popular songs and albums</sub></td>
+<td align="center"><img src="docs/search.jpg" alt="Search and browse moods"><br><sub><b>Search</b> and browse by mood</sub></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/equalizer.jpg" alt="Sound panel with crossfade and equalizer"><br><sub><b>Sound</b>: crossfade and a 5-band equalizer with presets</sub></td>
+<td align="center"><img src="docs/story-1.jpg" width="46%" alt="Story card"> <img src="docs/story-2.jpg" width="46%" alt="Story card"><br><sub><b>Story cards</b> to share what you're playing</sub></td>
+</tr>
+</table>
+
+</div>
+
 ## ✨ Features
 
 <table>
@@ -134,11 +159,7 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 
 Share what you're listening to as a 1080×1920 card, ready for Instagram or WhatsApp stories. The card takes its colours from the album art, adds the lyric line you're on, and shows how far into the song you are. On macOS it opens the native share sheet (AirDrop, Messages, Photos…); you can also save or copy the image.
 
-<div align="center">
-<img src="docs/story-1.jpg" width="260" alt="Story card example">
-&nbsp;&nbsp;&nbsp;
-<img src="docs/story-2.jpg" width="260" alt="Story card example">
-</div>
+
 
 ## ⌨️ Keyboard shortcuts
 
@@ -234,7 +255,7 @@ You'll need the Xcode command line tools and `brew install uv go makensis`, plus
 
 <img src="assets/logo.png" width="40" alt="">
 
-**Svara** · MIT License
+**Svara** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Hiroyki/Svara/releases) · [Report a bug](https://github.com/Hiroyki/Svara/issues/new/choose) · MIT License
 
 <sub>Svara is not affiliated with YouTube or Google. For personal use.</sub>
 
