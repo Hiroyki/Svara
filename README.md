@@ -1,7 +1,9 @@
 <div align="center">
 
+<img src="assets/logo.png" width="104" alt="Svara logo">
+
 <pre>
-███████╗██╗   ██╗ █████╗ ██████╗  █████╗ 
+███████╗██╗   ██╗ █████╗ ██████╗  █████╗
 ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔══██╗
 ███████╗██║   ██║███████║██████╔╝███████║
 ╚════██║╚██╗ ██╔╝██╔══██║██╔══██╗██╔══██║
@@ -9,376 +11,231 @@
 ╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 </pre>
 
-### *A music player for the* **catalogue**
+### *Feel every note.*
 
-<pre>
-┌─────────────────────────────────────────────────────────────────────┐
-│   Dark bento interface.  Real catalog data.  No clutter.            │
-│   Browse · Search · Albums · Artists · Playlists · Radio · Lyrics   │
-└─────────────────────────────────────────────────────────────────────┘
-</pre>
+**An ad-free desktop music player for the YouTube Music catalogue.**
+<br>
+Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listening Recap
 
+<br>
+
+[![Release](https://img.shields.io/github/v/release/Hiroyki/Svara?style=for-the-badge&color=ffc94a&label=release)](https://github.com/Hiroyki/Svara/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Hiroyki/Svara/total?style=for-the-badge&color=ff7a6b)](https://github.com/Hiroyki/Svara/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows_·_macOS-b69cff.svg?style=for-the-badge)](#-download)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ddc6b.svg?style=for-the-badge)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0-c2f25c.svg?style=for-the-badge)]()
-[![Platform](https://img.shields.io/badge/platform-web_·_windows_·_android-3ddc6b.svg?style=for-the-badge)]()
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000.svg?style=for-the-badge&logo=nextdotjs)]()
-[![Electron](https://img.shields.io/badge/Electron-45-2b2e3a.svg?style=for-the-badge&logo=electron)]()
-[![Capacitor](https://img.shields.io/badge/Capacitor-8-119eff.svg?style=for-the-badge&logo=capacitor)]()
 
 <br>
 
-**[🇺🇸 English](#-english)** &nbsp;·&nbsp; **[🇮🇩 Bahasa Indonesia](#-bahasa-indonesia)**
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe"><img src="https://img.shields.io/badge/Download_for-Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white" height="42" alt="Download for Windows"></a>
+&nbsp;&nbsp;
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg"><img src="https://img.shields.io/badge/Download_for-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" height="42" alt="Download for macOS"></a>
+
+<sub>Windows 10/11 64-bit · macOS 13+ (Apple Silicon & Intel) · nothing else to install</sub>
+
+<br><br>
+
+<img src="docs/screenshot.png" width="900" alt="Svara: home, queue and player">
 
 <br>
 
-<pre>
-EVERY SURFACE, ONE CODEBASE                               
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━    
- Web            ·  npm run dev                            
- Windows        ·  Electron shell + Next standalone server
- Android        ·  Capacitor shell + static export        
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━    
-</pre>
+| 🚫 **No ads** | 📝 **Karaoke lyrics** | 🎛️ **EQ + crossfade** | 💾 **Offline songs** | 🔒 **No account** |
+| :---: | :---: | :---: | :---: | :---: |
+| Just the music | Synced line by line | Gapless, 5-band | Saved to your disk | Everything stays local |
 
 </div>
 
 ---
 
-<br>
+## 🎧 What is Svara?
 
-## 🇺🇸 English
+**Svara** is a music player for your computer that plays the whole YouTube Music catalogue without ads. Charts, moods, albums, artists, playlists and endless radio mixes, with lyrics that light up as the song plays, a proper equalizer, crossfade between songs, podcasts, and songs you can save to listen offline.
 
-### What is Svara?
+There's no sign-up and no cloud: your library, playlists and listening history live on your own computer.
 
-**Svara** is an ad-light music player for the **catalogue**. It browses the real catalogue — charts, new releases, genres and moods, albums, artists, playlists, radio and synced lyrics — inside a hand-built dark **bento** interface where the artwork carries the colour and green means "this is on".
+## 📥 Download
 
-It is not a downloader and not a store. It is a player: one Zustand store owns the queue, playback talks to a hidden embed player, and the UI never touches either directly.
+| | Platform | File | Size |
+| :---: | --- | --- | --- |
+| 🪟 | **Windows 10 / 11** (64-bit) | [**Svara-Setup-2.0.0.exe**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe) | ~100 MB |
+| 🍎 | **macOS 13 Ventura or newer** (Apple Silicon & Intel) | [**Svara-2.0.0.dmg**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | ~250 MB |
 
-> **Svara is one codebase that ships to the browser, Windows, and Android.**
+Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno and ffmpeg) is already inside. No Homebrew, no Terminal, no extra installs.
 
-<br>
-
-### ✨ Features
-
-| | Feature | What it does |
-| --- | --- | --- |
-| 🏠 | **Explore** | Hero carousel (5 slides, 7s each), charts, new releases, moods and genres. |
-| 🔍 | **Search** | Instant suggestions while typing, then songs, albums, artists and playlists. |
-| 💿 | **Collections** | Album, artist and playlist pages with full track tables and playback. |
-| 📻 | **Radio / Autoplay** | "Next" queue built from the catalogue's radio endpoint; keeps playing when the queue ends. |
-| 📝 | **Lyrics** | Timed lyrics synced to the player clock. |
-| ❤️ | **Library** | Likes, recents and your own local playlists, persisted to `localStorage`. |
-| 🎛️ | **Player** | Queue, shuffle, repeat, seek, volume, marquee titles, Now Playing overlay. |
-| ⌨️ | **Keyboard-first** | Full shortcut set, no mouse required. |
-| 🪟 | **Desktop shell** | Electron window with a splash intro, dark title bar and a bundled local server. |
-| 🤖 | **Android app** | Capacitor app with native HTTP, keeps playing with the screen off, media notification and lock-screen / headset controls, back button that never kills the music. |
+<details open>
+<summary><b>🪟 Installing on Windows</b></summary>
 
 <br>
 
-### 🔧 How it works
+1. Run **`Svara-Setup-2.0.0.exe`**.
+2. Click **Next → Next → Install → Finish**. That's it.
+3. Svara opens on its own (leave *Run Svara* ticked) and appears in the Start menu, plus a desktop shortcut if you want one.
 
-| Layer | Where | What |
-| --- | --- | --- |
-| **Data** | `src/lib/yt.ts` | An in-house client talks to the catalogue's internal API. Responses are normalised into small `Track` / `Card` / `Section` types and cached in memory. |
-| **API** | `src/app/api/*` | `home`, `search`, `suggest`, `album/[id]`, `playlist/[id]`, `artist/[id]`, `next/[id]` (radio), `lyrics/[id]`, `img`. |
-| **State** | `src/lib/player.ts` | Zustand store: queue, shuffle, repeat, autoplay radio, likes, recents and local playlists. Likes, recents and playlists are saved to `localStorage`. |
-| **Playback** | `src/components/Engine.tsx` | A hidden embed player. The UI talks only to the store, so this engine can be replaced without touching the UI. |
-| **Design** | `docs/design-system.md` | Tokens, type scale, shape, motion and component rules. |
+- No admin rights needed: it installs for your user only.
+- If SmartScreen shows *"Windows protected your PC"*, click **More info → Run anyway**. The installer just isn't code-signed yet.
+- Uninstall from **Settings → Apps → Svara**. It asks whether to keep your library for a later reinstall.
 
-The three build targets are chosen by `SVARA_TARGET` in `next.config.ts`:
+</details>
 
-| Target | Output | Used by |
-| --- | --- | --- |
-| `web` *(default)* | Normal Next.js server | Browser / hosting |
-| `desktop` | `output: "standalone"` server | Electron bundles it and starts it on a free port |
-| `android` | `output: "export"` static site | Capacitor; `fetch` goes through native HTTP |
+<details open>
+<summary><b>🍎 Installing on macOS</b></summary>
 
 <br>
 
-### 🚀 Run it
+1. Open **`Svara-2.0.0.dmg`** and drag **Svara** onto **Applications**.
+2. Open Svara from Applications.
+3. The first time, macOS may say it can't verify the developer (Svara isn't notarised by Apple yet). Go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only do this once.
 
-```bash
-npm install
-npm run dev          # http://localhost:3000
-```
+- Closing the window keeps the music playing. Quit with **⌘Q**.
+- Still blocked? Run this once in Terminal: `xattr -dr com.apple.quarantine /Applications/Svara.app`
 
-The catalogue's API often blocks requests from datacenter IPs, so run Svara locally — a hosted deploy may stop returning data.
+</details>
 
-<br>
+## ✨ Features
 
-### 📦 Build for Windows
+<table>
+<tr>
+<td width="33%" valign="top">
 
-```bash
-npm run desktop:build
-```
+### 🎧 Listen
+- **Endless Up Next**: radio mixes from any song, with mood chips
+- **Smart shuffle** slips in similar songs
+- **Gapless crossfade** between tracks
+- **5-band equalizer** and live spectrum visualizer
+- **Karaoke lyrics**, synced line by line
+- **Mini player** that floats over other windows
+- **Sleep timer**
 
-This builds the desktop Next standalone server, stages the Electron shell in `.desktop-app/`, and runs `electron-builder`. The installer lands at:
+</td>
+<td width="33%" valign="top">
 
-```
-dist/Svara-Setup-1.0.0.exe
-```
+### 🔍 Discover
+- **Adaptive home**: daily mix, "continue listening", recommendations for your country
+- **Mood cards**: Galau, Santai sore, Indie Indonesia, Lo-fi, Dangdut koplo, K-pop…
+- **Search** songs, albums, artists, playlists and podcasts
+- **Album, artist and playlist pages**
+- **Podcasts**: subscribe and play episodes
 
-An NSIS-assisted installer: per-user, allows a custom install directory, creates desktop and Start Menu shortcuts, and launches Svara when finished.
+</td>
+<td width="33%" valign="top">
 
-```bash
-npm run desktop:dev   # build + run the Electron app without packaging
-```
+### 💛 Yours
+- **Library**: liked songs, playlists, albums, artists
+- **Save the queue** as a playlist in one click
+- **Offline songs** saved to your Music folder
+- **Svara Recap**: minutes listened, top songs and artists, streaks
+- **Story cards** to share what you're playing
+- **Light & dark** themes that follow your system
 
-<br>
+</td>
+</tr>
+</table>
 
-### 🤖 Build for Android
+## 📸 Story cards
 
-Requires JDK 21 and the Android SDK with platform 36 (`JAVA_HOME` and `ANDROID_HOME` set). Then:
+Share what you're listening to as a 1080×1920 card, ready for Instagram or WhatsApp stories. The card takes its colours from the album art, adds the lyric line you're on, and shows how far into the song you are. On macOS it opens the native share sheet (AirDrop, Messages, Photos…); you can also save or copy the image.
 
-```bash
-npm run android:sync                 # static export + cap sync
-cd android && ./gradlew assembleDebug
-# APK → android/app/build/outputs/apk/debug/app-debug.apk
-```
+<div align="center">
+<img src="docs/story-1.jpg" width="260" alt="Story card example">
+&nbsp;&nbsp;&nbsp;
+<img src="docs/story-2.jpg" width="260" alt="Story card example">
+</div>
 
-For a signed release build, put `storeFile`, `storePassword`, `keyAlias` and `keyPassword` in `~/.android/svara-release.properties` (or point `SVARA_KEYSTORE_PROPERTIES` at another file). Keep the keystore out of the repo and back it up: updates only install over an APK signed with the same key. Then:
-
-```bash
-cd android && ./gradlew assembleRelease   # or bundleRelease for an .aab
-```
-
-<br>
-
-### ⌨️ Keyboard
+## ⌨️ Keyboard shortcuts
 
 | Key | Action | Key | Action |
 | --- | --- | --- | --- |
-| `Space` | Play / pause | `M` | Mute |
-| `←` / `→` | Seek 5s | `L` | Like |
-| `Shift+←` / `Shift+→` | Previous / next | `S` | Shuffle |
-| `↑` / `↓` | Volume | `R` | Repeat |
-| `F` | Open Now Playing | `/` | Search |
-| `Esc` | Close | | |
+| <kbd>Space</kbd> | Play / pause | <kbd>L</kbd> | Lyrics |
+| <kbd>→</kbd> <kbd>←</kbd> | Seek ±10 s | <kbd>M</kbd> | Mute |
+| <kbd>⇧</kbd> <kbd>→</kbd> <kbd>←</kbd> | Next / previous song | <kbd>E</kbd> | Sound & equalizer |
+| <kbd>↑</kbd> <kbd>↓</kbd> | Volume | <kbd>P</kbd> | Mini player |
+| <kbd>⌘K</kbd> / <kbd>/</kbd> | Search | <kbd>?</kbd> | All shortcuts |
+
+## 🔒 Privacy
+
+- **No account, no sign-in.** Svara never asks for your Google login.
+- **No ads, no tracking, no analytics.**
+- Your library, playlists, history and Recap are stored **only on your computer**.
+- The app talks to a small server that runs **on your own machine**, which fetches the catalogue, lyrics and audio for you.
+
+## ❓ FAQ
+
+<details>
+<summary><b>Is it free?</b></summary>
+<br>
+Yes. Svara is free and open source under the MIT license.
+</details>
+
+<details>
+<summary><b>Do I need a YouTube or YouTube Music account?</b></summary>
+<br>
+No. Svara works without signing in to anything.
+</details>
+
+<details>
+<summary><b>Where do saved (offline) songs go?</b></summary>
+<br>
+Into <code>Music/Senandung</code> in your home folder, as normal audio files you can also play elsewhere.
+</details>
+
+<details>
+<summary><b>How do I update?</b></summary>
+<br>
+Download the newest installer from <a href="https://github.com/Hiroyki/Svara/releases">Releases</a> and install over the old one. Your library stays.
+</details>
+
+<details>
+<summary><b>A song won't play. What now?</b></summary>
+<br>
+YouTube changes things from time to time; a newer Svara release usually fixes it. On macOS the log lives at <code>~/Library/Logs/Svara.log</code>, on Windows at <code>%LOCALAPPDATA%\Senandung\senandung.log</code>. Please attach it when you open an issue.
+</details>
+
+## 🔧 How it works
+
+```
+┌──────────────────── Svara app window ────────────────────┐
+│   macOS: Swift + WKWebView     Windows: Go + WebView2    │
+│   ┌──────────── interface (HTML · CSS · JS) ───────────┐ │
+│   │  index.html · app.js · style.css · db.js (library) │ │
+│   └─────────────────────────┬──────────────────────────┘ │
+└─────────────────────────────┼────────────────────────────┘
+                              │  127.0.0.1:5560 (your machine only)
+              ┌───────────────┴───────────────┐
+              │  server.py (bundled Python)   │──► yt-dlp + Deno  → catalogue & audio
+              │  lyrics · images · podcasts   │──► ffmpeg         → offline songs
+              └───────────────────────────────┘──► RSS            → podcasts
+```
+
+<details>
+<summary><b>🛠️ Build it yourself</b></summary>
 
 <br>
 
-### 🧱 Tech stack
+Both apps are built from a Mac:
 
-| | |
+```sh
+./build-mac.sh       # → dist/Svara.app + dist/Svara-<version>.dmg
+./build-windows.sh   # → dist-windows/Svara.exe + dist-windows/Svara-Setup-<version>.exe
+```
+
+You'll need the Xcode command line tools and `brew install uv go makensis`, plus Pillow (`pip3 install pillow`). The scripts download Python, yt-dlp, Deno and ffmpeg for each platform and pack them into the app.
+
+| Path | What |
 | --- | --- |
-| Framework | Next.js 16 (App Router, Turbopack), React 19 |
-| Language | TypeScript |
-| Styling | Tailwind CSS 4 (tokens in `src/app/globals.css`) |
-| Motion | `motion` (Framer Motion) |
-| State | Zustand 5 |
-| Data | In-house catalogue client |
-| Desktop | Electron 45 + electron-builder 26 |
-| Mobile | Capacitor 8 (Android) |
-| Icons | lucide-react |
+| `index.html` · `app.js` · `style.css` · `db.js` | The interface (no framework, no build step) |
+| `server.py` · `ytworker.py` | Local server and always-warm yt-dlp workers |
+| `mac/main.swift` | macOS app: window, menus, server lifecycle, native share sheet |
+| `windows/` | Windows app (Go + WebView2) and the NSIS installer |
 
-<br>
-
-### 🗂️ Repository structure
-
-```
-Svara/
-├── src/
-│   ├── app/                 Next.js App Router
-│   │   ├── api/             home · search · suggest · album · playlist · artist · next · lyrics · img
-│   │   └── ...              album · artist · charts · library · liked · playlist · recent · search
-│   ├── components/          Shell, Sidebar, TopBar, PlayerBar, NowPlaying, Lyrics, Engine, …
-│   └── lib/                 yt (data) · player (store) · format · art · color · localApi · http · runtime
-│
-├── electron/                main.cjs (window + server) · splash.html
-├── scripts/                 prepare-desktop.mjs · after-pack.cjs
-├── build/                   icon.ico · installer art · installer.nsh
-├── android/                 Capacitor Android project
-├── docs/                    design-system.md
-├── capacitor.config.ts      Android shell config
-├── next.config.ts           SVARA_TARGET: web · desktop · android
-└── package.json             scripts + electron-builder config
-```
-
-<br>
-
-### 📄 License
-
-MIT © 2026 MrColdZs. See [LICENSE](LICENSE).
-
----
-
-<br>
-
-## 🇮🇩 Bahasa Indonesia
-
-### Apa itu Svara?
-
-**Svara** adalah pemutar musik minim iklan untuk **katalog musik**. Aplikasi ini menjelajah katalog aslinya — tangga lagu, rilis baru, genre dan mood, album, artis, playlist, radio, hingga lirik — di dalam antarmuka **bento** gelap yang dibuat khusus, tempat sampul lagu yang membawa warna dan hijau berarti "sedang aktif".
-
-Ini bukan pengunduh dan bukan toko. Ini pemutar: satu store Zustand memegang antrean, pemutaran bicara ke embed player tersembunyi, dan UI tidak pernah menyentuh keduanya secara langsung.
-
-> **Svara adalah satu basis kode yang dikirim ke browser, Windows, dan Android.**
-
-<br>
-
-### ✨ Fitur
-
-| | Fitur | Kegunaan |
-| --- | --- | --- |
-| 🏠 | **Explore** | Carousel hero (5 slide, 7 detik), tangga lagu, rilis baru, mood dan genre. |
-| 🔍 | **Pencarian** | Saran instan saat mengetik, lalu lagu, album, artis, dan playlist. |
-| 💿 | **Koleksi** | Halaman album, artis, dan playlist dengan tabel lagu lengkap dan pemutaran. |
-| 📻 | **Radio / Autoplay** | Antrean "Berikutnya" dari endpoint radio katalog; terus berputar saat antrean habis. |
-| 📝 | **Lirik** | Lirik berwaktu yang tersinkron dengan jam pemutar. |
-| ❤️ | **Pustaka** | Suka, riwayat, dan playlist lokal, disimpan di `localStorage`. |
-| 🎛️ | **Pemutar** | Antrean, acak, ulang, geser, volume, judul berjalan, overlay Now Playing. |
-| ⌨️ | **Utamakan keyboard** | Set pintasan lengkap, tanpa perlu mouse. |
-| 🪟 | **Shell desktop** | Jendela Electron dengan intro splash, title bar gelap, dan server lokal yang dibundel. |
-| 🤖 | **Aplikasi Android** | Aplikasi Capacitor dengan HTTP native, tetap berputar saat layar mati, notifikasi media dan kontrol lock screen / headset, tombol Back yang tidak mematikan musik. |
-
-<br>
-
-### 🔧 Cara kerjanya
-
-| Lapisan | Lokasi | Peran |
-| --- | --- | --- |
-| **Data** | `src/lib/yt.ts` | Klien internal berbicara ke API internal katalog. Respons dinormalkan menjadi tipe `Track` / `Card` / `Section` yang ringkas dan di-cache di memori. |
-| **API** | `src/app/api/*` | `home`, `search`, `suggest`, `album/[id]`, `playlist/[id]`, `artist/[id]`, `next/[id]` (radio), `lyrics/[id]`, `img`. |
-| **State** | `src/lib/player.ts` | Store Zustand: antrean, acak, ulang, radio autoplay, suka, riwayat, dan playlist lokal. Suka, riwayat, dan playlist disimpan di `localStorage`. |
-| **Pemutaran** | `src/components/Engine.tsx` | Embed player tersembunyi. UI hanya bicara ke store, jadi mesin ini bisa diganti tanpa menyentuh UI. |
-| **Desain** | `docs/design-system.md` | Token, skala tipografi, bentuk, gerak, dan aturan komponen. |
-
-Tiga target build dipilih lewat `SVARA_TARGET` di `next.config.ts`:
-
-| Target | Output | Dipakai oleh |
-| --- | --- | --- |
-| `web` *(default)* | Server Next.js biasa | Browser / hosting |
-| `desktop` | Server `output: "standalone"` | Electron membundel lalu menjalankannya di port bebas |
-| `android` | Situs statis `output: "export"` | Capacitor; `fetch` lewat HTTP native |
-
-<br>
-
-### 🚀 Menjalankan
-
-```bash
-npm install
-npm run dev          # http://localhost:3000
-```
-
-API katalog sering memblokir permintaan dari IP pusat data, jadi jalankan Svara secara lokal — deploy yang di-hosting bisa berhenti mengembalikan data.
-
-<br>
-
-### 📦 Build untuk Windows
-
-```bash
-npm run desktop:build
-```
-
-Perintah ini membangun server standalone Next desktop, menyiapkan shell Electron di `.desktop-app/`, lalu menjalankan `electron-builder`. Installer muncul di:
-
-```
-dist/Svara-Setup-1.0.0.exe
-```
-
-Installer berbantuan NSIS: per-pengguna, boleh memilih folder instalasi, membuat pintasan Desktop dan Start Menu, dan menjalankan Svara setelah selesai.
-
-```bash
-npm run desktop:dev   # build + jalankan aplikasi Electron tanpa dipaketkan
-```
-
-<br>
-
-### 🤖 Build untuk Android
-
-Butuh JDK 21 dan Android SDK dengan platform 36 (`JAVA_HOME` dan `ANDROID_HOME` diatur). Lalu:
-
-```bash
-npm run android:sync                 # static export + cap sync
-cd android && ./gradlew assembleDebug
-# APK → android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-Untuk build rilis yang ditandatangani, isi `storeFile`, `storePassword`, `keyAlias` dan `keyPassword` di `~/.android/svara-release.properties` (atau arahkan `SVARA_KEYSTORE_PROPERTIES` ke file lain). Simpan keystore di luar repo dan backup: update hanya bisa dipasang di atas APK yang ditandatangani dengan kunci yang sama. Lalu:
-
-```bash
-cd android && ./gradlew assembleRelease   # atau bundleRelease untuk .aab
-```
-
-<br>
-
-### ⌨️ Pintasan keyboard
-
-| Tombol | Aksi | Tombol | Aksi |
-| --- | --- | --- | --- |
-| `Space` | Putar / jeda | `M` | Bisukan |
-| `←` / `→` | Geser 5s | `L` | Suka |
-| `Shift+←` / `Shift+→` | Sebelumnya / berikutnya | `S` | Acak |
-| `↑` / `↓` | Volume | `R` | Ulang |
-| `F` | Buka Now Playing | `/` | Cari |
-| `Esc` | Tutup | | |
-
-<br>
-
-### 🧱 Teknologi
-
-| | |
-| --- | --- |
-| Kerangka | Next.js 16 (App Router, Turbopack), React 19 |
-| Bahasa | TypeScript |
-| Styling | Tailwind CSS 4 (token di `src/app/globals.css`) |
-| Gerak | `motion` (Framer Motion) |
-| State | Zustand 5 |
-| Data | Klien katalog internal |
-| Desktop | Electron 45 + electron-builder 26 |
-| Mobile | Capacitor 8 (Android) |
-| Ikon | lucide-react |
-
-<br>
-
-### 🗂️ Struktur repositori
-
-```
-Svara/
-├── src/
-│   ├── app/                 Next.js App Router
-│   │   ├── api/             home · search · suggest · album · playlist · artist · next · lyrics · img
-│   │   └── ...              album · artist · charts · library · liked · playlist · recent · search
-│   ├── components/          Shell, Sidebar, TopBar, PlayerBar, NowPlaying, Lyrics, Engine, …
-│   └── lib/                 yt (data) · player (store) · format · art · color · localApi · http · runtime
-│
-├── electron/                main.cjs (jendela + server) · splash.html
-├── scripts/                 prepare-desktop.mjs · after-pack.cjs
-├── build/                   icon.ico · art installer · installer.nsh
-├── android/                 Proyek Capacitor Android
-├── docs/                    design-system.md
-├── capacitor.config.ts      Konfigurasi shell Android
-├── next.config.ts           SVARA_TARGET: web · desktop · android
-└── package.json             skrip + konfigurasi electron-builder
-```
-
-<br>
-
-### 📄 Lisensi
-
-MIT © 2026 MrColdZs. Lihat [LICENSE](LICENSE).
-
-<br>
+</details>
 
 ---
 
 <div align="center">
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                                                                     │
-│   Music should play. Not autoplay, not track you across the web,    │
-│   not bury itself under ads.                                        │
-│                                                                     │
-│   Svara keeps the catalogue and drops the noise.                    │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+<img src="assets/logo.png" width="40" alt="">
 
-**Svara** · MIT License © 2026 MrColdZs
+**Svara** · MIT License
 
-[github.com/Hiroyki/Svara](https://github.com/Hiroyki/Svara)
-
-*The artwork carries the colour. Green just means it's on.*
+<sub>Svara is not affiliated with YouTube or Google. For personal use.</sub>
 
 </div>

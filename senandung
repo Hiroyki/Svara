@@ -1,0 +1,5 @@
+#!/bin/sh
+# Nyalain Svara, terus buka di Chrome
+cd "$(dirname "$0")"
+(sleep 1; open -a "Google Chrome" http://localhost:5560/) &
+exec python3 server.py
