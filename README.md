@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="docs/banner.svg" width="100%" alt="Svara: feel every note">
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/banner-light.svg">
+  <img src="docs/banner.svg" width="100%" alt="Svara: feel every note">
+</picture>
 
 <br>
 
@@ -23,6 +26,7 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 ![Go](https://img.shields.io/badge/Go-Windows-00add8?style=flat-square&logo=go&logoColor=white&labelColor=1a1922)
 ![Python](https://img.shields.io/badge/Python-server-3776ab?style=flat-square&logo=python&logoColor=white&labelColor=1a1922)
 ![JavaScript](https://img.shields.io/badge/JavaScript-UI-f7df1e?style=flat-square&logo=javascript&logoColor=black&labelColor=1a1922)
+[![Made in Indonesia](https://img.shields.io/badge/Made_in-Indonesia_🇮🇩-e11d48?style=flat-square&labelColor=1a1922)](#-made-in-indonesia)
 
 <br>
 
@@ -34,7 +38,10 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 
 <br><br>
 
-<img src="docs/screenshot.png" width="900" alt="Svara: home, queue and player">
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/home-light.jpg">
+  <img src="docs/screenshot.png" width="900" alt="Svara: home, queue and player">
+</picture>
 
 <br>
 
@@ -120,6 +127,35 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 <td align="center"><img src="docs/story-1.jpg" width="46%" alt="Story card"> <img src="docs/story-2.jpg" width="46%" alt="Story card"><br><sub><b>Story cards</b> to share what you're playing</sub></td>
 </tr>
 </table>
+
+</div>
+
+## 🎞️ Feature tour
+
+<div align="center">
+
+<img src="docs/feature-story.gif" width="880" alt="Making a story card">
+<br><sub><b>Story cards</b>: one click turns the song you're playing (and the lyric line you're on) into a 1080×1920 card</sub>
+
+<br><br>
+
+<table>
+<tr>
+<td align="center" valign="top" width="50%">
+<img src="docs/feature-eq.gif" width="380" alt="Equalizer presets">
+<br><sub><b>5-band equalizer</b>: flat, bass boost, vocal, acoustic, electronic, rock, night and treble presets, or drag your own</sub>
+</td>
+<td align="center" valign="top" width="50%">
+<img src="docs/feature-upnext.gif" width="270" alt="Up Next mood chips">
+<br><sub><b>Up Next</b>: switch the mood of an endless mix with one tap</sub>
+</td>
+</tr>
+</table>
+
+<br>
+
+<img src="docs/recap.jpg" width="880" alt="Svara Recap">
+<br><sub><b>Svara Recap</b>: minutes listened, your #1 song, listening persona, streaks and new discoveries <i>(shown with demo listening history)</i></sub>
 
 </div>
 
@@ -256,6 +292,28 @@ You'll need the Xcode command line tools and `brew install uv go makensis`, plus
 | `windows/` | Windows app (Go + WebView2) and the NSIS installer |
 
 </details>
+
+## 🧰 Built with
+
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=swift,go,python,js,html,css&theme=dark" alt="Swift, Go, Python, JavaScript, HTML, CSS">
+
+</div>
+
+| | Piece | Used for |
+| :---: | --- | --- |
+| 🍎 | **Swift + WebKit** | The native macOS window, menus and share sheet |
+| 🪟 | **Go + WebView2** | The native Windows window, with Python, yt-dlp, Deno and ffmpeg embedded |
+| 🐍 | **Python + [yt-dlp](https://github.com/yt-dlp/yt-dlp)** | The local server that finds songs and streams audio |
+| ✨ | **Vanilla JS, HTML & CSS** | The whole interface: no framework, no build step |
+| 🎵 | **[LRCLIB](https://lrclib.net)** | Synced lyrics |
+
+## 🇮🇩 Made in Indonesia
+
+Svara is built in Indonesia, and it shows. The name comes from Sanskrit *svara*, a musical note, the same root as the Indonesian word *suara*: sound, voice. The moods are local too: **Galau** (in your feelings), **Santai sore** (lazy afternoon), **Indie Indonesia**, **Dangdut koplo** and more, next to Lo-fi and K-pop. Recommendations follow your own country, wherever you are.
+
+> The app's interface is in Indonesian for now.
 
 ## 🤝 Contributing
 
