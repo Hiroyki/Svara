@@ -97,6 +97,9 @@ const I = {
   edit: o('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
   disc: o('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>'),
   panel: o('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/>'),
+  share: o('<path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>'),
+  pip: o('<rect x="2" y="4" width="20" height="16" rx="2.5"/><rect x="12" y="11" width="7" height="6" rx="1.2" fill="currentColor" stroke="none"/>'),
+  copy: o('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>'),
   sliders: o('<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/>'),
   stats: o('<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16V12"/><path d="M12 16V8"/><path d="M17 16v-5"/>'),
   fire: o('<path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-9-1 2-2 3-4 3 1-3 0-5-2-7 0 4-5 6-5 12 0 4.3 3 8 8 8z"/>'),
@@ -151,6 +154,8 @@ const S = {
   radioIds: new Set(),
   sleep: null,
   log: [], // riwayat dengerin: [waktu, id, detik]
+  smartIds: new Set(), // lagu sisipan smart shuffle
+  skips: {}, // id -> berapa kali di-skip cepat
 };
 /* ---------- mesin audio: dua elemen, biar bisa crossfade & gapless ---------- */
 // Lagu berikutnya disiapin di elemen cadangan, terus tinggal "tukar" pas pindah lagu.
@@ -240,7 +245,8 @@ function vizStart() { if (!vizRaf) vizRaf = requestAnimationFrame(vizFrame); }
 function vizFrame(now) {
   vizRaf = 0;
   const cvs = $$('canvas.spec').filter((c) => (c.closest('#np') ? npOpen() : c.offsetParent !== null));
-  if (!cvs.length) return;
+  if (pipWin) cvs.push(...pipWin.document.querySelectorAll('canvas.spec'));
+  if (!cvs.length && !npOpen()) return;
   vizV ||= new Float32Array(VIZ_N);
   if (!vizCol || now - vizColAt > 1000) {
     const cs = getComputedStyle(document.documentElement);
@@ -269,8 +275,52 @@ function vizFrame(now) {
   }
   const d = durNow(), prog = d ? Math.min(1, posNow() / d) : 0;
   for (const c of cvs) drawWave(c, prog);
+  beatTick(now, live);
+  if (npOpen()) drawRing();
   hhFrame(now, live);
   if (playing || energy > 0.05) vizRaf = requestAnimationFrame(vizFrame);
+}
+// Bar spektrum yang tumbuh keluar dari keempat sisi cover di layar penuh, warnanya dari cover
+let ringPal = null, ringPalU = '';
+function drawRing() {
+  const c = $('.np-ring'), art = $('.np-art');
+  if (!c || !art) return;
+  const t = cur();
+  if (t?.art !== ringPalU) { ringPalU = t?.art || ''; ringPal = null; if (t?.art) palette(t.art).then((p) => { if (ringPalU === t.art) ringPal = p; }); }
+  const dpr = devicePixelRatio || 1, cr = c.getBoundingClientRect(), ar = art.getBoundingClientRect();
+  if (!cr.width || !ar.width) return;
+  if (c.width !== Math.round(cr.width * dpr)) { c.width = Math.round(cr.width * dpr); c.height = Math.round(cr.height * dpr); }
+  const x = c.getContext('2d');
+  x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  x.clearRect(0, 0, cr.width, cr.height);
+  const S0 = ar.width, gap = 12, x0 = ar.left - cr.left - gap, y0 = ar.top - cr.top - gap, side = S0 + gap * 2;
+  const cx = x0 + side / 2, cy = y0 + side / 2, maxL = Math.min(70, S0 * 0.16);
+  const [c1, c2, c3] = ringPal || [vizCol[0], vizCol[1], vizCol[2]];
+  const g = x.createConicGradient(-Math.PI / 2, cx, cy);
+  g.addColorStop(0, c1); g.addColorStop(0.33, c2); g.addColorStop(0.66, c3); g.addColorStop(1, c1);
+  x.strokeStyle = g;
+  x.lineCap = 'round';
+  x.lineWidth = Math.max(2.5, side / 150);
+  const n = 112;
+  for (let k = 0; k < n; k++) {
+    const pos = k / n;
+    // spektrum dicerminkan biar simetris; bass di tengah sisi atas, sisi bawah dipendekin biar nggak nimpa judul
+    const m = 1 - Math.abs(((pos - 0.125 + 1) % 1) * 2 - 1);
+    const v = vizV[Math.floor(m * (VIZ_N - 1) * 0.75)];
+    const tt = pos * 4, sd = Math.floor(tt), u = tt - sd;
+    const L = 3 + v * maxL * (sd === 2 ? 0.35 : 1);
+    let px, py, nx, ny;
+    if (sd === 0) { px = x0 + u * side; py = y0; nx = 0; ny = -1; }
+    else if (sd === 1) { px = x0 + side; py = y0 + u * side; nx = 1; ny = 0; }
+    else if (sd === 2) { px = x0 + side - u * side; py = y0 + side; nx = 0; ny = 1; }
+    else { px = x0; py = y0 + side - u * side; nx = -1; ny = 0; }
+    x.globalAlpha = 0.35 + v * 0.65;
+    x.beginPath();
+    x.moveTo(px, py);
+    x.lineTo(px + nx * L, py + ny * L);
+    x.stroke();
+  }
+  x.globalAlpha = 1;
 }
 function drawWave(c, prog) {
   const dpr = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
@@ -487,7 +537,9 @@ function playFrom(ids, i = 0, shuffle = false, srcName) {
     S.queue = [first, ...shuffled(ids.filter((_, k) => k !== i))];
     i = 0;
   } else S.queue = [...ids];
+  S.smartIds.clear();
   load(i);
+  if (S.shuffle === 'smart') smartFill();
 }
 
 function togglePlay() {
@@ -597,6 +649,7 @@ async function ensureRadio() {
 
 async function next(auto = false) {
   if (!S.queue.length) return;
+  if (!auto) noteSkip();
   if (S.idx + 1 >= S.queue.length && S.radio && S.repeat !== 'all') await ensureRadio();
   if (S.idx + 1 < S.queue.length) return load(S.idx + 1);
   if (S.repeat === 'all' || !auto) return load(0, S.repeat === 'all' || !auto);
@@ -612,18 +665,58 @@ function prev() {
   load(S.idx - 1);
 }
 
+// Acak: mati -> acak -> smart shuffle (diselipin lagu mirip ✨, lagu yang sering di-skip ditaruh belakang)
 function toggleShuffle() {
-  S.shuffle = !S.shuffle;
   const id = S.queue[S.idx];
-  if (S.shuffle) S.queue = [...S.queue.slice(0, S.idx + 1), ...shuffled(S.queue.slice(S.idx + 1))];
-  else if (S.base.length) {
-    S.queue = [...S.base];
-    S.idx = Math.max(0, S.queue.indexOf(id));
+  S.shuffle = !S.shuffle ? true : S.shuffle === true ? 'smart' : false;
+  if (S.shuffle === true) S.queue = [...S.queue.slice(0, S.idx + 1), ...shuffled(S.queue.slice(S.idx + 1))];
+  else if (S.shuffle === 'smart') smartFill();
+  else {
+    dropSmart();
+    if (S.base.length) { S.queue = [...S.base]; S.idx = Math.max(0, S.queue.indexOf(id)); }
   }
   renderBar();
   renderQueue();
   saveState();
-  toast(S.shuffle ? 'Acak nyala' : 'Acak mati');
+  toast({ true: 'Acak nyala', smart: '✨ Smart shuffle: diselipin lagu mirip', false: 'Acak mati' }[S.shuffle]);
+}
+function dropSmart() {
+  S.queue = S.queue.filter((x, i) => i <= S.idx || !S.smartIds.has(x));
+  S.smartIds.clear();
+}
+let smartBusy = false;
+async function smartFill() {
+  const t = cur();
+  if (!t?.vid || smartBusy) return;
+  smartBusy = true;
+  try {
+    const rest = S.queue.slice(S.idx + 1).filter((x) => !S.smartIds.has(x));
+    const ok = shuffled(rest.filter((x) => (S.skips[x] || 0) < 2)), late = rest.filter((x) => (S.skips[x] || 0) >= 2);
+    const seeds = [t, ...ok.slice(0, 2).map(T)].filter((x) => x?.vid).slice(0, 2);
+    const ds = await Promise.all(seeds.map((x) => upNext(x.vid).catch(() => null)));
+    if (S.shuffle !== 'smart' || cur() !== t) return;
+    const have = new Set(S.queue);
+    const recs = shuffled([...new Set(ds.flatMap((d) => d?.items || []).map((x) => song(x).id))].filter((x) => !have.has(x) && (S.skips[x] || 0) < 2));
+    const out = [];
+    let r = 0;
+    const add = () => { if (recs[r]) { S.smartIds.add(recs[r]); out.push(recs[r++]); } };
+    ok.forEach((x, i) => { out.push(x); if (i % 3 === 2) add(); });
+    while (out.length < 15 && recs[r]) add();
+    S.queue = [...S.queue.slice(0, S.idx + 1), ...out, ...late];
+    saveTracks();
+    renderQueue();
+    renderNowSide(true);
+    saveState();
+  } finally { smartBusy = false; }
+}
+// Skip di 30 detik pertama = sinyal "kurang suka"
+const saveSkips = debounce(() => kv.set('skips', S.skips), 1000);
+function noteSkip() {
+  const t = cur();
+  if (!t || t.kind !== 'song' || !audio.src) return;
+  const c = audio.currentTime, d = durNow();
+  if (c < 30 && d > 60) { S.skips[t.id] = (S.skips[t.id] || 0) + 1; saveSkips(); }
+  else if (c > d * 0.6 && S.skips[t.id]) { S.skips[t.id]--; saveSkips(); }
 }
 
 function cycleRepeat() {
@@ -948,7 +1041,12 @@ function renderBar() {
   renderPlayBtn();
   $$('[data-act=prev]').forEach((b) => (b.innerHTML = I.prev));
   $$('[data-act=next]').forEach((b) => (b.innerHTML = I.next));
-  $$('[data-act=shuffle]').forEach((b) => { b.innerHTML = I.shuffle; b.classList.toggle('on', S.shuffle); });
+  $$('[data-act=shuffle]').forEach((b) => {
+    b.innerHTML = I.shuffle;
+    b.classList.toggle('on', !!S.shuffle);
+    b.classList.toggle('smart', S.shuffle === 'smart');
+    b.title = { true: 'Acak (klik lagi: smart shuffle)', smart: 'Smart shuffle (klik: matiin)', false: 'Acak' }[S.shuffle];
+  });
   $$('[data-act=repeat]').forEach((b) => { b.innerHTML = S.repeat === 'one' ? I.repeat1 : I.repeat; b.classList.toggle('on', S.repeat !== 'off'); });
   $$('.ib[data-act=queue]').forEach((b) => { b.innerHTML = I.queue; b.classList.toggle('on', S.panel === 'queue'); });
   $$('.ib[data-act=lyrics]').forEach((b) => {
@@ -1137,7 +1235,7 @@ function upHeadHtml() {
 const upRow = (id, qi, now) => {
   const x = T(id);
   return `<li class="q-row${now ? ' q-cur' : ''}" data-qi="${qi}" draggable="${now ? 'false' : 'true'}">${cover(x.art, 'sm', x.id)}
-    <div class="q-txt"><div>${esc(x.title)}</div><span>${S.radioIds.has(id) && !S.src?.mix ? '<em class="rtag">radio</em> ' : ''}${esc(x.artist)}</span></div>
+    <div class="q-txt"><div>${esc(x.title)}</div><span>${S.smartIds.has(id) ? '<em class="rtag smart">✨ smart</em> ' : S.radioIds.has(id) && !S.src?.mix ? '<em class="rtag">radio</em> ' : ''}${esc(x.artist)}</span></div>
     ${now ? EQ : ''}<span class="q-dur mono">${x.duration ? fmt(x.duration) : ''}</span>
     ${now ? '' : `<button class="ib xs" data-do="qremove" title="Hapus dari antrean" aria-label="Hapus">${I.x}</button>`}</li>`;
 };
@@ -1673,7 +1771,8 @@ const TABS = [['songs', 'Lagu'], ['albums', 'Album'], ['artists', 'Artis'], ['pl
 /* ---------- hero beranda: ikut keadaan (pengguna baru / ada riwayat / lagi muter) ---------- */
 
 const GREET_E = { pagi: '☀️', siang: '🌤️', sore: '🌇', malam: '🌙' };
-const MIX_NAME = { pagi: 'Mix Pagi Semangat', siang: 'Mix Fokus Siang', sore: 'Mix Senja', malam: 'Mix Tengah Malam' };
+const GREET_EN = { pagi: 'Good morning', siang: 'Good afternoon', sore: 'Good evening', malam: 'Good evening' };
+const MIX_NAME = { pagi: 'Morning Boost Mix', siang: 'Afternoon Focus Mix', sore: 'Golden Hour Mix', malam: 'Late Night Mix' };
 // Lagu favorit: sering diputar, yang baru-baru ini bobotnya lebih gede
 function favSongs() {
   const now = Date.now();
@@ -1691,28 +1790,29 @@ function hhLeft(st, t) {
   const g = GREET();
   if (st === 'play') {
     const n = S.plays[t.id]?.n || 0;
-    const tags = [`<span class="hh-tag live">${EQ.replace('eq', 'eq hh-eq')} Sedang diputar</span>`];
+    const tags = [`<span class="hh-tag live">${EQ.replace('eq', 'eq hh-eq')} Now playing</span>`];
     if (S.src?.name) tags.push(`<span class="hh-tag">${I.disc}${esc(S.src.name)}</span>`);
-    if (n > 1) tags.push(`<span class="hh-tag">${I.fire}${n}× diputar</span>`);
-    if (S.loved.has(t.id)) tags.push(`<span class="hh-tag love">${I.heartF}Favorit</span>`);
+    if (n > 1) tags.push(`<span class="hh-tag">${I.fire}Played ${n}×</span>`);
+    if (S.loved.has(t.id)) tags.push(`<span class="hh-tag love">${I.heartF}Favorite</span>`);
     return `<div class="hh-tags">${tags.join('')}</div>
       <h1 class="hh-t">${esc(t.title)}</h1><p class="hh-a">${esc(t.artist)}</p>
       <div class="hh-lyr" aria-live="off"><p class="l1"></p><p class="l2"></p></div>
       <div class="hh-prog"><span class="hh-cur">0:00</span><canvas class="spec hh-spec" aria-hidden="true"></canvas><span class="hh-rem">-0:00</span></div>
-      <div class="hh-ctl"><button class="ib xl hh-play" data-act="play" aria-label="Putar atau jeda">${I.pause}</button><button class="ib" data-act="next" aria-label="Berikutnya">${I.next}</button><button class="ib" data-act="love" aria-label="Suka">${S.loved.has(t.id) ? I.heartF : I.heart}</button><button class="ib" data-act="np" aria-label="Layar penuh">${I.full}</button>
-        <button class="hh-next" data-do="hhnext" hidden><span class="hh-next-art"></span><span class="hh-next-t"><small>Berikutnya</small><b></b></span></button></div>`;
+      <div class="hh-ctl"><button class="ib xl hh-play" data-act="play" aria-label="Putar atau jeda">${I.pause}</button><button class="ib" data-act="next" aria-label="Berikutnya">${I.next}</button><button class="ib" data-act="love" aria-label="Suka">${S.loved.has(t.id) ? I.heartF : I.heart}</button><button class="ib" data-act="np" aria-label="Layar penuh">${I.full}</button><button class="ib" data-act="share" aria-label="Bagikan">${I.share}</button>
+        <button class="hh-next" data-do="hhnext" hidden><span class="hh-next-art"></span><span class="hh-next-t"><small>Up next</small><b></b></span></button></div>`;
   }
-  const head = `<p class="h2-k">Selamat ${g} ${GREET_E[g]}</p><h1>Mau dengerin <span class="rot"><b>apa hari ini</b></span>?</h1>`;
+  // Tanda tanya nempel ke kata yang berganti, biar nggak turun sendirian ke baris baru
+  const head = `<p class="h2-k">${GREET_EN[g]} ${GREET_E[g]}</p><h1>In the mood for <span class="rq"><span class="rot"><b>${esc(ROT_WORDS[rotI])}</b></span>?</span></h1>`;
   if (st === 'new') {
-    return head + `<p class="hh-sub">Pilih mood dulu, sisanya biar Svara yang nyariin.</p><div class="hh-moods">${MOODS.slice(0, 4).map((m) => `<a href="#/search/songs/${enc(m)}"><span>${MOOD_EMOJI.find(([re]) => re.test(m))?.[1] || '🎵'}</span>${esc(m)}</a>`).join('')}</div>`;
+    return head + `<p class="hh-sub">Pick a mood and let Svara handle the rest.</p><div class="hh-moods">${MOODS.slice(0, 4).map((m) => `<a href="#/search/songs/${enc(m)}"><span>${MOOD_EMOJI.find(([re]) => re.test(m))?.[1] || '🎵'}</span>${esc(m)}</a>`).join('')}</div>`;
   }
   const fav = favSongs();
   const arts = [...new Set(fav.map((id) => mainArtist(T(id).artist)).filter(Boolean))].slice(0, 2);
   const covers = [...new Set(fav.map((id) => T(id).art).filter(Boolean))].slice(0, 3);
   const resume = cur()?.kind === 'song' ? cur() : t;
   return head + `<div class="hh-acts">
-      <button class="hh-mix" data-do="daymix"><span class="hh-mix-art">${covers.map((u, i) => `<img src="${esc(u)}" alt="" style="--i:${i}" onload="this.classList.add('ok')">`).join('')}<span class="hh-mix-go">${I.play}</span></span><span class="hh-mix-t"><b>Putar ${MIX_NAME[g]}</b><small>${arts.length ? `Dari ${arts.map(esc).join(' & ')} + lagu mirip` : 'Lagu favorit kamu + lagu mirip'}</small></span></button>
-      ${resume ? `<button class="hh-cont" data-do="hhcont">${I.repeat}<span>Lanjutin <b>${esc(resume.title)}</b></span></button>` : ''}
+      <button class="hh-mix" data-do="daymix"><span class="hh-mix-art">${covers.map((u, i) => `<img src="${esc(u)}" alt="" style="--i:${i}" onload="this.classList.add('ok')">`).join('')}<span class="hh-mix-go">${I.play}</span></span><span class="hh-mix-t"><b>Play ${MIX_NAME[g]}</b><small>${arts.length ? `${arts.map(esc).join(' & ')} + similar songs` : 'Your favorites + similar songs'}</small></span></button>
+      ${resume ? `<button class="hh-cont" data-do="hhcont">${I.repeat}<span>Resume <b>${esc(resume.title)}</b></span></button>` : ''}
     </div>`;
 }
 function hhRight(st, t) {
@@ -1769,6 +1869,7 @@ function tintHero(el) {
 }
 // Ganti isi hero tanpa render ulang halaman: piringan tetap di tempat, jarumnya yang gerak
 function updateHomeHero() {
+  renderPip();
   const el = $('.page .hh');
   if (!el) return;
   const st = heroState(), t = heroTrack();
@@ -1840,18 +1941,22 @@ function hhFrame(now, live) {
     const c = audio.currentTime, st = L[hhLyrK].t, en = L[hhLyrK + 1]?.t ?? st + 4;
     el.style.setProperty('--lp', (Math.min(1, Math.max(0, (c - st) / Math.max(0.4, en - st))) * 100).toFixed(1) + '%');
   }
+  // Dentuman: not musik nyembur dari piringan
+  if (kickNow) hhBurst(el);
+}
+// Denyut bass dihitung sekali per frame, dibagi ke hero, player bar, dan layar penuh
+let kickNow = false;
+function beatTick(now, live) {
   let bass = 0;
   for (let i = 0; i < 6; i++) bass += vizV[i];
   bass /= 6;
   if (!live && !audio.paused) bass = 0.3 + 0.25 * Math.max(0, Math.sin(now / 240));
   beatV += (bass - beatV) * (bass > beatV ? 0.6 : 0.12);
   bassAvg += (bass - bassAvg) * 0.03;
-  el.style.setProperty('--beat', beatV.toFixed(3));
-  // Dentuman: not musik nyembur dari piringan
-  if (!audio.paused && bass > 0.32 && bass > bassAvg * 1.3 && now - lastKick > 320 && !reduceMotion.matches) {
-    lastKick = now;
-    hhBurst(el);
-  }
+  kickNow = !audio.paused && bass > 0.32 && bass > bassAvg * 1.3 && now - lastKick > 320 && !reduceMotion.matches;
+  if (kickNow) lastKick = now;
+  const b = beatV.toFixed(3);
+  for (const el of [$('#lcd'), npOpen() ? $('#np') : null, $('.page .hh.st-play')]) el?.style.setProperty('--beat', b);
 }
 const NOTE_CH = ['♪', '♫', '♬', '♩', '•', '✦'];
 function hhBurst(el) {
@@ -1887,7 +1992,7 @@ async function playDayMix(btn) {
   btn?.classList.remove('busy');
   saveTracks();
   playFrom(out, 0, false, MIX_NAME[GREET()]);
-  toast(`${MIX_NAME[GREET()]} · ${out.length} lagu`);
+  toast(`${MIX_NAME[GREET()]} · ${out.length} songs`);
 }
 
 // Banner kecil di beranda: ringkasan 7 hari terakhir
@@ -2243,7 +2348,7 @@ function toggleLove(id, el) {
   add ? S.loved.add(id) : S.loved.delete(id);
   saveLoved();
   renderBar();
-  if (add && el) burst(el);
+  if (add && el) loveFx(el);
   if (location.hash === '#/loved') route(true);
   else for (const r of $$(`.tr[data-id="${CSS.escape(id)}"] .td`)) r.innerHTML = (add ? `<span class="lv">${I.heartF}</span>` : '') + (T(id).duration ? fmt(T(id).duration) : '');
 }
@@ -2308,6 +2413,7 @@ function trackMenu(id) {
     { label: S.loved.has(id) ? 'Hapus dari favorit' : 'Favoritkan', act: () => toggleLove(id) },
     { label: 'Tambah ke playlist', sub: playlistSub([id]) },
   ];
+  if (t.kind === 'song') items.push({ label: 'Bagikan (kartu story)', act: () => shareCard('song', id) });
   if (t.kind === 'song') {
     if (!S.savedVids.has(t.vid)) items.push({ label: 'Download buat offline', act: () => saveOffline(t) });
     items.push('-');
@@ -2364,6 +2470,8 @@ const ACTS = {
   fwd30: () => seekTo(audio.currentTime + 30),
   sleep: (el) => sleepMenu(el),
   fx: () => showFx(),
+  share: () => shareCard('song', S.queue[S.idx]),
+  pip: () => openPip(),
   theme: () => {
     const order = ['auto', 'light', 'dark'];
     setTheme(order[(order.indexOf(themePref()) + 1) % 3]);
@@ -2415,6 +2523,7 @@ document.addEventListener('click', (e) => {
     }
     if (k === 'playall') return playFrom(ml);
     if (k === 'daymix') return playDayMix(d);
+    if (k === 'recapshare') return shareCard('recap', d.dataset.p);
     if (k === 'hhnext') return next();
     if (k === 'hhcont') { if (cur()) return togglePlay(); const id = lastSong(); return id && playMix(id, [id], 0); }
     if (k === 'eqp') return setEq([...EQ_PRESETS[d.dataset.p][1]], d.dataset.p);
@@ -2536,10 +2645,41 @@ document.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'l' && !e.metaKey) togglePanel('lyrics');
   else if (e.key.toLowerCase() === 'm' && !e.metaKey) ACTS.mute();
   else if (e.key.toLowerCase() === 'e' && !e.metaKey) showFx();
+  else if (e.key.toLowerCase() === 'p' && !e.metaKey) openPip();
 });
 
 /* ---------- motion ---------- */
 
+// Pas nge-love: percikan + hati-hati kecil terbang + hati besar muncul sekilas di atas cover + getar halus
+function loveFx(el) {
+  burst(el);
+  navigator.vibrate?.(14);
+  if (reduceMotion.matches) return;
+  const r = el.getBoundingClientRect();
+  for (let i = 0; i < 7; i++) {
+    const h = document.createElement('i');
+    h.className = 'love-pt';
+    h.innerHTML = I.heartF;
+    h.style.left = r.left + r.width / 2 + 'px';
+    h.style.top = r.top + r.height / 2 + 'px';
+    h.style.color = ['#ff5e9c', '#ff7a7a', '#b49bff', '#ffc94a'][i % 4];
+    document.body.append(h);
+    const dx = (Math.random() * 2 - 1) * 60, dy = -60 - Math.random() * 70, sc = 0.6 + Math.random() * 0.7;
+    h.animate([
+      { transform: 'translate(-50%,-50%) scale(.2)', opacity: 0 },
+      { transform: `translate(calc(-50% + ${dx * 0.4}px), calc(-50% + ${dy * 0.4}px)) scale(${sc})`, opacity: 1, offset: 0.3 },
+      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${sc * 0.8}) rotate(${dx / 3}deg)`, opacity: 0 },
+    ], { duration: 900 + Math.random() * 400, easing: 'cubic-bezier(.2,.7,.3,1)', delay: i * 30 }).onfinish = () => h.remove();
+  }
+  for (const art of $$('.lcd-art, .np.open .np-art, .page .hh .sleeve')) {
+    const b = document.createElement('i');
+    b.className = 'love-big';
+    b.innerHTML = I.heartF;
+    art.append(b);
+    b.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.15)', opacity: 1, offset: 0.35 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.6 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 0 }], { duration: 900, easing: 'ease-out' }).onfinish = () => b.remove();
+    art.animate([{ transform: 'scale(1)' }, { transform: 'scale(.94)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 500, easing: 'ease-out' });
+  }
+}
 function burst(el) {
   if (reduceMotion.matches) return;
   const r = el.getBoundingClientRect();
@@ -2603,7 +2743,7 @@ $('#view').addEventListener('scroll', () => $('.top').classList.toggle('scrolled
 let toastT;
 /* ---------- sapaan yang ganti-ganti ---------- */
 
-const ROT_WORDS = ['apa hari ini', 'yang galau', 'yang santai', 'yang bikin semangat', 'lagu lawas', 'yang lagi viral'];
+const ROT_WORDS = ['something new', 'heartbreak songs', 'something chill', 'a hype boost', 'old-school hits', "what's trending"];
 let rotI = 0;
 setInterval(() => {
   const el = $('.hello2 .rot');
@@ -2641,7 +2781,7 @@ if (reduceMotion.matches) $('#intro')?.remove();
 /* ---------- daftar shortcut ---------- */
 
 const KEYS = [['Spasi', 'Putar / jeda'], ['→ / ←', 'Maju / mundur 10 detik'], ['⇧ → / ⇧ ←', 'Lagu berikutnya / sebelumnya'], ['↑ / ↓', 'Volume naik / turun'],
-  ['L', 'Buka / tutup lirik'], ['M', 'Bisu'], ['E', 'Suara & equalizer'], ['⌘K atau /', 'Cari'], ['Esc', 'Tutup layar penuh / menu'], ['?', 'Daftar shortcut ini']];
+  ['L', 'Buka / tutup lirik'], ['M', 'Bisu'], ['E', 'Suara & equalizer'], ['P', 'Mini player melayang'], ['⌘K atau /', 'Cari'], ['Esc', 'Tutup layar penuh / menu'], ['?', 'Daftar shortcut ini']];
 function showKeys() {
   const d = $('#keys');
   if (d.open) return d.close();
@@ -2838,6 +2978,7 @@ VIEWS.recap = (arg) => {
     + `<section class="rc-hero" data-art="${esc(t1?.art || '')}">${heroBg(t1?.art)}
         <div class="rc-hi"><span class="rc-k">${I.stats} Svara Recap · ${label}</span>
         <h1><b class="rc-num" data-n="${mins}">${nf.format(mins)}</b> menit</h1>
+        <button class="btn sm rc-share" data-do="recapshare" data-p="${per}">${I.share} Bagikan Recap</button>
         <p class="rc-sub">kamu habisin buat dengerin <b>${nf.format(R.top.length)} lagu</b> dari <b>${nf.format(R.artists.length)} artis</b>${R.est ? ' <small>(sebagian perkiraan dari riwayat lama)</small>' : ''}</p>
         <div class="rc-persona"><span>${pe}</span><span><b>${pn}</b><small>${pd} · paling rame jam ${String(R.peak).padStart(2, '0')}.00</small></span></div></div>
         ${t1 ? `<div class="rc-one" data-id="${esc(t1.id)}" data-ml="${key}" data-i="0">${cover(bigArt(t1.art), 'rc-art', t1.id)}<span class="rc-badge">#1</span><div><small>Lagu nomor satu kamu</small><b>${esc(t1.title)}</b><span>${esc(t1.artist)} · ${top[0].n}× diputar</span></div><span class="rc-go">${I.play}</span></div>` : ''}
@@ -2866,6 +3007,334 @@ function countUp(root) {
     };
     requestAnimationFrame(step);
   }
+}
+
+/* ---------- kartu share (story 1080×1920) ---------- */
+
+const loadImg = (u) => new Promise((res) => { if (!u) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = u; });
+function wrapText(x, text, maxW, maxLines) {
+  const words = String(text).split(/\s+/), lines = [];
+  let line = '';
+  for (const w of words) {
+    const t = line ? `${line} ${w}` : w;
+    if (x.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t;
+  }
+  if (line) lines.push(line);
+  if (lines.length > maxLines) { lines.length = maxLines; let l = lines[maxLines - 1]; while (x.measureText(l + '…').width > maxW && l) l = l.slice(0, -1); lines[maxLines - 1] = l + '…'; }
+  return lines;
+}
+// Latar blur: ctx.filter belum ada di WebKit, jadi fallback-nya kecilin dulu terus gedein (hasilnya lembut juga)
+const canvasFilter = 'filter' in CanvasRenderingContext2D.prototype;
+function blurBg(x, im, X, Y, W, H) {
+  if (canvasFilter) { x.filter = 'blur(90px) saturate(1.5)'; coverFill(x, im, X, Y, W, H); x.filter = 'none'; return; }
+  let src = im;
+  for (const s of [18, 72, 288]) {
+    const c = document.createElement('canvas');
+    c.width = s; c.height = Math.round((s * H) / W);
+    const cx = c.getContext('2d');
+    cx.imageSmoothingQuality = 'high';
+    if (src === im) coverFill(cx, im, 0, 0, c.width, c.height); else cx.drawImage(src, 0, 0, c.width, c.height);
+    src = c;
+  }
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(src, X, Y, W, H);
+}
+function coverFill(x, im, X, Y, W, H) {
+  const r = Math.max(W / im.width, H / im.height), w = im.width * r, h = im.height * r;
+  x.drawImage(im, X + (W - w) / 2, Y + (H - h) / 2, w, h);
+}
+function drawVinyl(x, cx, cy, r, label) {
+  x.save();
+  x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fillStyle = '#121216'; x.fill();
+  for (let k = r * 0.42; k < r; k += 7) { x.beginPath(); x.arc(cx, cy, k, 0, Math.PI * 2); x.strokeStyle = 'rgba(255,255,255,.045)'; x.lineWidth = 2; x.stroke(); }
+  const g = x.createConicGradient(0.6, cx, cy);
+  g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.08, 'rgba(255,255,255,.12)'); g.addColorStop(0.16, 'rgba(255,255,255,0)'); g.addColorStop(0.55, 'rgba(255,255,255,0)'); g.addColorStop(0.62, 'rgba(255,255,255,.08)'); g.addColorStop(0.7, 'rgba(255,255,255,0)');
+  x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fillStyle = g; x.fill();
+  if (label) { x.save(); x.beginPath(); x.arc(cx, cy, r * 0.38, 0, Math.PI * 2); x.clip(); coverFill(x, label, cx - r * 0.38, cy - r * 0.38, r * 0.76, r * 0.76); x.restore(); }
+  x.beginPath(); x.arc(cx, cy, r * 0.04, 0, Math.PI * 2); x.fillStyle = '#16161a'; x.fill();
+  x.restore();
+}
+function shareFooter(x, logo, W, H) {
+  x.save();
+  x.font = '800 38px "Plus Jakarta Sans"';
+  const tw = x.measureText('Svara').width, lw = logo ? 52 : 0, gap = logo ? 16 : 0, X = (W - lw - gap - tw) / 2, Y = H - 120;
+  x.globalAlpha = 0.85;
+  if (logo) x.drawImage(logo, X, Y - 26, lw, lw);
+  x.fillStyle = '#fff'; x.textBaseline = 'middle';
+  x.fillText('Svara', X + lw + gap, Y + 1);
+  x.restore();
+}
+let shareBusy = false;
+async function shareCard(kind, arg) {
+  if (shareBusy) return;
+  if (kind === 'song' && !T(arg)) return toast('Putar lagu dulu ya');
+  shareBusy = true;
+  toast('Lagi bikin kartu story…');
+  try { await drawShareCard(kind, arg); } catch (err) { console.error('share card', err); toast('Kartu gagal dibikin, coba lagi'); } finally { shareBusy = false; }
+}
+async function drawShareCard(kind, arg) {
+  const W = 1080, H = 1920;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  await Promise.all(['800 80px "Plus Jakarta Sans"', '600 40px "Plus Jakarta Sans"', '700 40px "Plus Jakarta Sans"'].map((f) => document.fonts.load(f).catch(() => {})));
+  const logo = await loadImg('assets/logo.png');
+  let name;
+  if (kind === 'song') {
+    const t = T(arg);
+    if (!t) return;
+    const [art, pal] = await Promise.all([loadImg(bigArt(t.art)), t.art ? palette(t.art) : null]);
+    const [c1, c2, c3] = pal || ['hsl(42 100% 62%)', 'hsl(0 100% 72%)', 'hsl(256 100% 78%)'];
+    x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, W, H);
+    if (art) { x.save(); x.globalAlpha = 0.75; blurBg(x, art, -200, -200, W + 400, H + 400); x.restore(); }
+    let g = x.createRadialGradient(W * 0.6, 640, 0, W * 0.6, 640, 760); g.addColorStop(0, c1); g.addColorStop(1, 'transparent');
+    x.globalAlpha = 0.45; x.fillStyle = g; x.fillRect(0, 0, W, H); x.globalAlpha = 1;
+    g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(0,0,0,.15)'); g.addColorStop(0.55, 'rgba(0,0,0,.35)'); g.addColorStop(1, 'rgba(0,0,0,.82)');
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    // ukur dulu isi teksnya biar seluruh susunan bisa ditaruh pas di tengah
+    const CV = 660, CX = 96;
+    x.font = '800 84px "Plus Jakarta Sans"';
+    const tl = wrapText(x, t.title, W - 192, 2);
+    x.font = '600 44px "Plus Jakarta Sans"';
+    const al = wrapText(x, [t.artist, t.album && t.album !== t.title ? t.album : ''].filter(Boolean).join(' · '), W - 192, 1)[0] || '';
+    const playing = S.queue[S.idx] === t.id;
+    const k = playing && S.lyr?.synced ? sideLyrK0() : -1;
+    const lyr = k >= 0 ? S.lyr.lines[k].text : (playing && S.lyr?.lines?.[0]?.text) || '';
+    x.font = 'italic 700 46px "Plus Jakarta Sans"';
+    const ls = lyr ? wrapText(x, `“${lyr}”`, W - 250, 3) : [];
+    const dur = t.duration || (playing && audio.duration) || 0;
+    const lyrH = ls.length ? ls.length * 60 + 64 : 0;
+    const total = CV + 96 + tl.length * 94 + 62 + (lyrH ? 56 + lyrH : 0) + 84 + 70 + (dur ? 64 : 0);
+    let y = Math.max(110, (H - 200 - total) / 2 + 20);
+    // sampul + piringan nyembul di kanan (masih di dalam kartu)
+    drawVinyl(x, CX + CV - 30, y + CV / 2, CV * 0.46, art);
+    x.save();
+    x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 80; x.shadowOffsetY = 34;
+    x.beginPath(); x.roundRect(CX, y, CV, CV, 28); x.fillStyle = '#1c1c22'; x.fill();
+    x.restore();
+    x.save(); x.beginPath(); x.roundRect(CX, y, CV, CV, 28); x.clip(); if (art) coverFill(x, art, CX, y, CV, CV);
+    x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = 3; x.stroke(); x.restore();
+    y += CV + 96;
+    // judul & artis
+    x.fillStyle = '#fff'; x.font = '800 84px "Plus Jakarta Sans"';
+    for (const l of tl) { y += 76; x.fillText(l, CX, y); y += 18; }
+    x.globalAlpha = 0.7; x.font = '600 44px "Plus Jakarta Sans"';
+    x.fillText(al, CX, y + 46); x.globalAlpha = 1;
+    y += 62;
+    // potongan lirik (kalau lagi diputar & ada liriknya)
+    if (ls.length) {
+      y += 56;
+      x.fillStyle = 'rgba(255,255,255,.09)'; x.beginPath(); x.roundRect(CX, y, W - CX * 2, lyrH, 30); x.fill();
+      x.fillStyle = c1; x.beginPath(); x.roundRect(CX, y + 24, 8, lyrH - 48, 4); x.fill();
+      x.fillStyle = '#fff'; x.font = 'italic 700 46px "Plus Jakarta Sans"';
+      ls.forEach((l, i) => x.fillText(l, CX + 50, y + 74 + i * 60));
+      y += lyrH;
+    }
+    // gelombang warna lagu
+    y += 84;
+    const n = 48, bw = 10, gap = (W - CX * 2 - n * bw) / (n - 1), mid = y + 35;
+    g = x.createLinearGradient(CX, 0, W - CX, 0); g.addColorStop(0, c1); g.addColorStop(0.5, c2); g.addColorStop(1, c3);
+    x.fillStyle = g;
+    const seed = hue(t.id), pr = dur && playing ? Math.min(1, audio.currentTime / dur) : 0.38;
+    for (let i = 0; i < n; i++) {
+      const v = 0.22 + 0.78 * Math.abs(Math.sin(i * 0.55 + seed) * Math.sin(i * 0.21 + seed * 0.3)), h = 10 + v * 60;
+      x.globalAlpha = (i + 0.5) / n <= pr ? 1 : 0.3;
+      x.beginPath(); x.roundRect(CX + i * (bw + gap), mid - h / 2, bw, h, 5); x.fill();
+    }
+    x.globalAlpha = 1;
+    y += 70;
+    // waktu jalan / durasi
+    if (dur) {
+      x.fillStyle = '#fff'; x.globalAlpha = 0.6; x.font = '600 32px "Plus Jakarta Sans"';
+      if (playing) x.fillText(fmt(pr * dur), CX, y + 52);
+      x.textAlign = 'right'; x.fillText(fmt(dur), W - CX, y + 52); x.textAlign = 'left'; x.globalAlpha = 1;
+    }
+    shareFooter(x, logo, W, H);
+    name = `svara-${t.title}`;
+  } else {
+    const per = arg || '7';
+    const R = recapData(per === 'all' ? 0 : +per);
+    const t1 = T(R.top[0]?.id);
+    const pal = t1?.art ? await palette(t1.art) : null;
+    const [c1, c2, c3] = pal || ['hsl(42 100% 62%)', 'hsl(0 100% 72%)', 'hsl(256 100% 78%)'];
+    x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, W, H);
+    for (const [cx, cy, r, col] of [[200, 250, 700, c1], [950, 900, 650, c2], [300, 1650, 700, c3]]) { const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, col); g.addColorStop(1, 'transparent'); x.globalAlpha = 0.42; x.fillStyle = g; x.fillRect(0, 0, W, H); }
+    x.globalAlpha = 1;
+    x.fillStyle = '#fff';
+    x.font = '700 34px "Plus Jakarta Sans"'; x.globalAlpha = 0.8;
+    x.fillText(`SVARA RECAP · ${{ 7: '7 HARI TERAKHIR', 30: '30 HARI TERAKHIR', all: 'SEPANJANG MASA' }[per]}`, 80, 200);
+    x.globalAlpha = 1;
+    const mins = nf.format(Math.round(R.secs / 60));
+    x.font = '800 250px "Plus Jakarta Sans"';
+    const g = x.createLinearGradient(80, 0, 80 + x.measureText(mins).width, 0); g.addColorStop(0, c1); g.addColorStop(0.5, c2); g.addColorStop(1, c3);
+    x.fillStyle = g; x.fillText(mins, 70, 460);
+    x.fillStyle = '#fff'; x.font = '800 64px "Plus Jakarta Sans"'; x.fillText('menit dengerin musik', 80, 560);
+    x.globalAlpha = 0.7; x.font = '600 38px "Plus Jakarta Sans"';
+    x.fillText(`${nf.format(R.top.length)} lagu · ${nf.format(R.artists.length)} artis · ${R.streak} hari beruntun`, 80, 630); x.globalAlpha = 1;
+    const [pe, pn] = PERSONA(R.peak);
+    x.fillStyle = 'rgba(255,255,255,.12)'; x.beginPath(); x.roundRect(80, 690, 640, 120, 60); x.fill();
+    x.fillStyle = '#fff'; x.font = '64px sans-serif'; x.fillText(pe, 110, 772);
+    x.fillStyle = '#fff'; x.font = '800 48px "Plus Jakarta Sans"'; x.fillText(pn, 210, 768);
+    x.font = '800 44px "Plus Jakarta Sans"'; x.fillText('Top lagu', 80, 920);
+    const covers = await Promise.all(R.top.slice(0, 5).map((s2) => loadImg(T(s2.id).art)));
+    R.top.slice(0, 5).forEach((s2, i) => {
+      const tt = T(s2.id), yy = 960 + i * 150;
+      x.globalAlpha = 1; x.fillStyle = i < 3 ? c1 : 'rgba(255,255,255,.55)'; x.font = '800 54px "Plus Jakarta Sans"'; x.fillText(String(i + 1), 84, yy + 82);
+      x.save(); x.beginPath(); x.roundRect(160, yy, 120, 120, 18); x.clip(); x.fillStyle = '#333'; x.fillRect(160, yy, 120, 120); if (covers[i]) coverFill(x, covers[i], 160, yy, 120, 120); x.restore();
+      x.fillStyle = '#fff'; x.font = '800 42px "Plus Jakarta Sans"'; x.fillText(wrapText(x, tt.title, 560, 1)[0], 310, yy + 52);
+      x.globalAlpha = 0.65; x.font = '600 32px "Plus Jakarta Sans"'; x.fillText(wrapText(x, tt.artist, 560, 1)[0], 310, yy + 98);
+      x.textAlign = 'right'; x.globalAlpha = 1; x.font = '800 40px "Plus Jakarta Sans"'; x.fillText(`${s2.n}×`, W - 80, yy + 72); x.textAlign = 'left';
+    });
+    x.globalAlpha = 1;
+    shareFooter(x, logo, W, H);
+    name = `svara-recap-${per}`;
+  }
+  let blob = await new Promise((r) => c.toBlob(r, 'image/png'));
+  if (!blob) blob = await (await fetch(c.toDataURL('image/png'))).blob();
+  showShare(blob, name.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() + '.png');
+}
+let shareUrl = null;
+const nativeShare = window.webkit?.messageHandlers?.svaraShare;
+const blobB64 = (blob) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+function showShare(blob, fname) {
+  const d = $('#share');
+  if (shareUrl) URL.revokeObjectURL(shareUrl);
+  shareUrl = URL.createObjectURL(blob);
+  const file = new File([blob], fname, { type: 'image/png' });
+  let canShare = false;
+  try { canShare = !nativeShare && !!navigator.canShare?.({ files: [file] }); } catch {}
+  const canCopy = !!nativeShare || (!!window.ClipboardItem && !!navigator.clipboard?.write);
+  const btns = [
+    nativeShare || canShare ? `<button class="btn ink" data-sh="share">${I.share} Bagikan</button>` : '',
+    `<button class="btn ${nativeShare || canShare ? '' : 'ink'}" data-sh="save">${I.save} Simpan gambar</button>`,
+    canCopy ? `<button class="btn" data-sh="copy">${I.copy} Salin</button>` : '',
+  ].join('');
+  d.innerHTML = `<div class="keys-h"><b>${I.share} Bagikan</b><button class="ib" data-close aria-label="Tutup">${I.x}</button></div>
+    <div class="share-prev"><img src="${shareUrl}" alt="Pratinjau kartu share"></div>
+    <div class="share-btns">${btns}</div>
+    <p class="share-hint">${nativeShare ? 'Buat story IG: Bagikan → AirDrop ke HP, atau Salin terus tempel.' : 'Ukuran 1080×1920, pas buat story.'}</p>`;
+  let b64 = null;
+  const native = async (action, b) => {
+    b64 ??= await blobB64(blob);
+    const r = b.getBoundingClientRect();
+    return nativeShare.postMessage({ action, name: fname, data: b64, rect: { x: r.left, y: r.top, w: r.width, h: r.height } });
+  };
+  d.onclick = async (e) => {
+    if (e.target === d || e.target.closest('[data-close]')) return d.close();
+    const b = e.target.closest('[data-sh]');
+    if (!b || b.disabled) return;
+    const act = b.dataset.sh;
+    b.disabled = true;
+    try {
+      if (nativeShare) {
+        const res = await native(act, b);
+        if (res === 'copied') toast('Gambar disalin, tinggal tempel');
+        else if (res === 'saved') toast('Gambar tersimpan');
+      } else if (act === 'share') {
+        await navigator.share({ files: [file], title: 'Svara' });
+      } else if (act === 'copy') {
+        // Safari mau ClipboardItem dikasih Promise biar izin gesture-nya nggak keburu habis
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': Promise.resolve(blob) })]);
+        toast('Gambar disalin, tinggal tempel');
+      } else {
+        const a = document.createElement('a');
+        a.href = shareUrl; a.download = fname;
+        document.body.append(a); a.click(); a.remove();
+        toast('Gambar diunduh');
+      }
+    } catch (err) {
+      if (err?.name !== 'AbortError') { console.error('share', err); toast(act === 'save' ? 'Gagal nyimpen gambar' : 'Gagal, coba "Simpan gambar" aja'); }
+    } finally { b.disabled = false; }
+  };
+  if (!d.open) d.showModal();
+}
+
+/* ---------- mini player melayang (Picture-in-Picture) ---------- */
+
+let pipWin = null, pipKey = '', pipVid = null, pipCvs = null, pipT = 0;
+async function openPip() {
+  if (pipWin) { pipWin.close(); return; }
+  if (document.pictureInPictureElement) { document.exitPictureInPicture(); return; }
+  if (!cur()) return toast('Putar lagu dulu ya');
+  if ('documentPictureInPicture' in window) {
+    try { pipWin = await documentPictureInPicture.requestWindow({ width: 340, height: 420 }); } catch { pipWin = null; return videoPip(); }
+    const d = pipWin.document;
+    d.head.innerHTML = `<base href="${esc(location.href.split('#')[0])}"><meta charset="utf-8"><link rel="stylesheet" href="style.css">`;
+    if (document.documentElement.dataset.theme) d.documentElement.dataset.theme = document.documentElement.dataset.theme;
+    d.documentElement.style.colorScheme = document.documentElement.style.colorScheme;
+    d.body.className = 'pip-body';
+    d.body.innerHTML = `<div class="pip"><div class="pip-bg"><img alt=""></div>
+      <div class="pip-deck"><div class="pip-vinyl vinyl"><span class="vinyl-lbl"></span></div><div class="pip-cover"></div></div>
+      <div class="pip-meta"><b class="pip-t"></b><span class="pip-a"></span></div>
+      <canvas class="spec pip-spec"></canvas>
+      <div class="pip-ctl"><button class="ib" data-pip="love" aria-label="Suka"></button><button class="ib" data-pip="prev" aria-label="Sebelumnya">${I.prev}</button><button class="ib pip-play" data-pip="play" aria-label="Putar atau jeda"></button><button class="ib" data-pip="next" aria-label="Berikutnya">${I.next}</button><button class="ib" data-pip="back" aria-label="Balik ke Svara">${I.full}</button></div></div>`;
+    d.body.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-pip]');
+      if (b) return ({ play: togglePlay, prev, next: () => next(), love: () => toggleLove(S.queue[S.idx]), back: () => { window.focus(); pipWin?.close(); } })[b.dataset.pip]?.();
+      const sp = e.target.closest('.pip-spec');
+      if (sp) { const r = sp.getBoundingClientRect(); seekTo(((e.clientX - r.left) / r.width) * durNow()); }
+    });
+    pipWin.addEventListener('pagehide', () => { pipWin = null; pipKey = ''; renderPipBtn(); });
+    pipKey = '';
+    renderPip();
+    renderPipBtn();
+    vizStart();
+    return;
+  }
+  videoPip();
+}
+function renderPip() {
+  if (pipVid && document.pictureInPictureElement === pipVid) drawPipFrame();
+  if (!pipWin) return;
+  const d = pipWin.document, t = cur();
+  if (!t) return;
+  const playing = !audio.paused;
+  $('.pip', d)?.classList.toggle('playing', playing);
+  const pb = $('.pip-play', d);
+  if (pb) pb.innerHTML = playing ? I.pause : I.play;
+  const lb = $('[data-pip=love]', d);
+  if (lb) { lb.innerHTML = S.loved.has(t.id) ? I.heartF : I.heart; lb.classList.toggle('on', S.loved.has(t.id)); }
+  if (pipKey === t.id) return;
+  pipKey = t.id;
+  $('.pip-t', d).textContent = t.title;
+  $('.pip-a', d).textContent = t.artist;
+  $('.pip-bg img', d).src = bigArt(t.art) || '';
+  $('.pip-cover', d).innerHTML = cover(bigArt(t.art), '', t.id);
+  $('.vinyl-lbl', d).innerHTML = cover(t.art, '', t.id);
+  d.title = `${t.title} · Svara`;
+}
+const renderPipBtn = () => $$('[data-act=pip]').forEach((b) => { b.innerHTML = I.pip; b.classList.toggle('on', !!pipWin || !!document.pictureInPictureElement); });
+// Cadangan buat browser tanpa Document PiP (Safari, app Mac): video PiP dari canvas, kontrolnya lewat Media Session
+async function videoPip() {
+  if (!document.pictureInPictureEnabled) return toast('Mini player belum didukung di sini');
+  pipCvs ||= Object.assign(document.createElement('canvas'), { width: 480, height: 480 });
+  pipVid ||= Object.assign(document.createElement('video'), { muted: true, playsInline: true });
+  drawPipFrame();
+  pipVid.srcObject ||= pipCvs.captureStream(4);
+  try {
+    await pipVid.play();
+    await pipVid.requestPictureInPicture();
+    pipT = setInterval(drawPipFrame, 500);
+    pipVid.onleavepictureinpicture = () => { clearInterval(pipT); renderPipBtn(); };
+    renderPipBtn();
+  } catch { toast('Mini player gagal dibuka'); }
+}
+let pipImg = null, pipImgU = '';
+function drawPipFrame() {
+  const t = cur();
+  if (!pipCvs || !t) return;
+  const x = pipCvs.getContext('2d'), W = 480;
+  const u = bigArt(t.art);
+  if (u !== pipImgU) { pipImgU = u; pipImg = null; loadImg(u).then((im) => { if (pipImgU === u) { pipImg = im; drawPipFrame(); } }); }
+  x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, W, W);
+  if (pipImg) coverFill(x, pipImg, 0, 0, W, W);
+  const g = x.createLinearGradient(0, W * 0.45, 0, W); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.85)');
+  x.fillStyle = g; x.fillRect(0, 0, W, W);
+  x.fillStyle = '#fff'; x.font = '800 34px "Plus Jakarta Sans", sans-serif'; x.fillText(wrapText(x, t.title, W - 48, 1)[0], 24, W - 74);
+  x.globalAlpha = 0.75; x.font = '600 22px "Plus Jakarta Sans", sans-serif'; x.fillText(wrapText(x, t.artist, W - 48, 1)[0], 24, W - 42); x.globalAlpha = 1;
+  const d = durNow(), p = d ? posNow() / d : 0;
+  x.fillStyle = 'rgba(255,255,255,.25)'; x.fillRect(24, W - 22, W - 48, 5);
+  x.fillStyle = '#ffc94a'; x.fillRect(24, W - 22, (W - 48) * p, 5);
 }
 
 /* ---------- tema ---------- */
@@ -2934,7 +3403,7 @@ for (const ev of ['play', 'pause']) onAudio(ev, () => pushRemote());
 window.addEventListener('pagehide', () => kv.set('state', stateObj()));
 
 async function init() {
-  const keys = ['state', 'playlists', 'loved', 'plays', 'tracks', 'yt', 'subs', 'podmeta', 'podpos', 'podDone', 'rate', 'savedColl', 'recentQ', 'feed', 'autoplay', 'radio', 'log', 'fx'];
+  const keys = ['state', 'playlists', 'loved', 'plays', 'tracks', 'yt', 'subs', 'podmeta', 'podpos', 'podDone', 'rate', 'savedColl', 'recentQ', 'feed', 'autoplay', 'radio', 'log', 'fx', 'skips'];
   const v = Object.fromEntries(await Promise.all(keys.map(async (k) => [k, await kv.get(k)])));
   for (const t of [...(v.yt || []), ...(v.tracks || [])]) {
     if (!t?.id || !(t.id.startsWith('yt:') || t.id.startsWith('pod:'))) continue;
@@ -2955,9 +3424,12 @@ async function init() {
   S.recentQ = v.recentQ || [];
   S.autoplay = v.autoplay ?? true;
   S.radio = v.radio ?? true;
+  S.skips = v.skips || {};
   S.log = (v.log || []).filter((e) => Array.isArray(e) && e.length === 3);
   if (v.fx) Object.assign(FX, v.fx, { xf: DUAL ? v.fx.xf || 0 : 0 });
   renderFxBtn();
+  renderPipBtn();
+  $$('[data-act=share]').forEach((b) => (b.innerHTML = I.share));
   if (localStorage.getItem('putar-side') === 'off') document.body.classList.add('side-off');
   if (localStorage.getItem('putar-lib') === 'mini') document.body.classList.add('lib-mini');
   if (v.feed?.data) {
@@ -2966,7 +3438,7 @@ async function init() {
   }
   const st = v.state;
   if (st) {
-    Object.assign(S, { queue: (st.queue || []).filter((id) => T(id)), base: (st.base || []).filter((id) => T(id)), shuffle: !!st.shuffle, repeat: st.repeat || 'off', volume: st.volume ?? 80, restorePos: st.pos || 0, panel: st.panel || null, src: st.src || null });
+    Object.assign(S, { queue: (st.queue || []).filter((id) => T(id)), base: (st.base || []).filter((id) => T(id)), shuffle: st.shuffle === 'smart' ? 'smart' : !!st.shuffle, repeat: st.repeat || 'off', volume: st.volume ?? 80, restorePos: st.pos || 0, panel: st.panel || null, src: st.src || null });
     S.idx = Math.min(st.idx ?? -1, S.queue.length - 1);
     audio.muted = !!st.muted;
   }

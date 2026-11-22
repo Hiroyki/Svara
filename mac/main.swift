@@ -28,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
         window.setFrameAutosaveName("SenandungWindow")
 
         let config = WKWebViewConfiguration()
+        config.userContentController.addScriptMessageHandler(ShareBridge(owner: self), contentWorld: .page, name: "svaraShare")
         config.mediaTypesRequiringUserActionForPlayback = []
         config.preferences.isElementFullscreenEnabled = true
         web = WKWebView(frame: .zero, configuration: config)
@@ -232,6 +233,68 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
     <p style="color:#a29fb2">Pastikan yt-dlp sama ffmpeg udah terpasang (brew install yt-dlp ffmpeg), terus buka ulang app-nya.
     Catatan error ada di ~/Library/Logs/Svara.log</p></div></body></html>
     """
+}
+
+// ---------- kartu share: WKWebView nggak bisa download blob / Web Share, jadi lewat native ----------
+// JS: await webkit.messageHandlers.svaraShare.postMessage({ action: 'share'|'save'|'copy', name, data: <base64 PNG>, rect? })
+final class ShareBridge: NSObject, WKScriptMessageHandlerWithReply {
+    weak var owner: AppDelegate?
+    init(owner: AppDelegate) { self.owner = owner }
+
+    func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
+                               replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let body = message.body as? [String: Any],
+              let action = body["action"] as? String,
+              let b64 = body["data"] as? String,
+              let png = Data(base64Encoded: b64), let image = NSImage(data: png),
+              let owner, let web = owner.web, let window = owner.window
+        else { return replyHandler(nil, "data kartu rusak") }
+        var name = (body["name"] as? String ?? "svara.png").replacingOccurrences(of: "/", with: "-")
+        if !name.lowercased().hasSuffix(".png") { name += ".png" }
+
+        switch action {
+        case "copy":
+            let pb = NSPasteboard.general
+            pb.clearContents()
+            pb.declareTypes([.png, .tiff], owner: nil)
+            pb.setData(png, forType: .png)
+            pb.setData(image.tiffRepresentation, forType: .tiff)
+            replyHandler("copied", nil)
+
+        case "save":
+            let panel = NSSavePanel()
+            panel.nameFieldStringValue = name
+            panel.allowedContentTypes = [.png]
+            panel.directoryURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+            panel.beginSheetModal(for: window) { res in
+                guard res == .OK, let url = panel.url else { return replyHandler("cancel", nil) }
+                do {
+                    try png.write(to: url, options: .atomic)
+                    NSWorkspace.shared.activateFileViewerSelecting([url])
+                    replyHandler("saved", nil)
+                } catch { replyHandler(nil, error.localizedDescription) }
+            }
+
+        case "share":
+            // File beneran (bukan cuma NSImage) biar AirDrop/Pesan/Foto dapet PNG dengan nama yang rapi
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("svara-share", isDirectory: true)
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let url = dir.appendingPathComponent(name)
+            do { try png.write(to: url, options: .atomic) } catch { return replyHandler(nil, error.localizedDescription) }
+            var rect = NSRect(x: web.bounds.midX - 1, y: web.bounds.midY - 1, width: 2, height: 2)
+            if let r = body["rect"] as? [String: Any],
+               let x = (r["x"] as? NSNumber)?.doubleValue, let y = (r["y"] as? NSNumber)?.doubleValue,
+               let w = (r["w"] as? NSNumber)?.doubleValue, let h = (r["h"] as? NSNumber)?.doubleValue {
+                // koordinat CSS dari atas-kiri; WKWebView itu flipped, jadi kalau nggak flipped dibalik
+                rect = NSRect(x: x, y: web.isFlipped ? y : web.bounds.height - y - h, width: w, height: h)
+            }
+            NSSharingServicePicker(items: [url]).show(relativeTo: rect, of: web, preferredEdge: .minY)
+            replyHandler("shown", nil)
+
+        default:
+            replyHandler(nil, "aksi nggak dikenal")
+        }
+    }
 }
 
 let app = NSApplication.shared

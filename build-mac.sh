@@ -5,7 +5,13 @@ cd "$(dirname "$0")"
 APP=dist/Svara.app
 rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/web" dist/AppIcon.iconset
 
-swiftc -O mac/main.swift -o "$APP/Contents/MacOS/Svara" -framework Cocoa -framework WebKit
+VERSION=2.0.0
+# Universal: Apple Silicon + Intel
+for arch in arm64 x86_64; do
+  swiftc -O -target $arch-apple-macos13 mac/main.swift -o "dist/Svara-$arch" -framework Cocoa -framework WebKit
+done
+lipo -create dist/Svara-arm64 dist/Svara-x86_64 -output "$APP/Contents/MacOS/Svara"
+rm dist/Svara-arm64 dist/Svara-x86_64
 
 cp index.html style.css app.js db.js sw.js manifest.webmanifest server.py ytworker.py favicon.png icon-192.png icon-512.png "$APP/Contents/Resources/web/"
 cp -R assets "$APP/Contents/Resources/web/"
@@ -36,8 +42,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleExecutable</key><string>Svara</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$VERSION</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.music</string>
   <key>NSHighResolutionCapable</key><true/>
@@ -46,6 +52,34 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 PLIST
 
 codesign --force --deep -s - "$APP"
+
+# DMG buat dibagiin: seret Svara ke Applications
+rm -rf dist/dmg && mkdir -p dist/dmg
+cp -R "$APP" dist/dmg/
+ln -s /Applications dist/dmg/Applications
+cat > "dist/dmg/Baca dulu - Read me.txt" <<'TXT'
+SVARA untuk macOS
+=================
+
+1) Seret Svara ke folder Applications.
+2) Pasang pembantunya sekali (butuh Homebrew, https://brew.sh):
+     brew install yt-dlp ffmpeg deno
+3) Pertama kali buka: klik kanan Svara -> Open -> Open.
+   Masih diblokir? System Settings -> Privacy & Security -> Open Anyway.
+
+-----------------------------------------------------------------
+
+1) Drag Svara into Applications.
+2) Install the helpers once (needs Homebrew, https://brew.sh):
+     brew install yt-dlp ffmpeg deno
+3) First launch: right-click Svara -> Open -> Open.
+   Still blocked? System Settings -> Privacy & Security -> Open Anyway.
+
+https://github.com/Hiroyki/Svara
+TXT
+hdiutil create -quiet -volname "Svara $VERSION" -srcfolder dist/dmg -ov -format UDZO "dist/Svara-$VERSION.dmg"
+rm -rf dist/dmg
+echo "DMG: dist/Svara-$VERSION.dmg"
 # App nama lama dibuang biar nggak dobel; bundle ID sama, jadi data tetap kebawa
 rm -rf "$HOME/Applications/Senandung.app" "$HOME/Applications/Svara.app"
 mkdir -p "$HOME/Applications"

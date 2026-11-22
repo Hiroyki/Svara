@@ -66,11 +66,12 @@
       </div>
       <div class="pb-seek">
         <span class="mono" data-np="cur">0:00</span>
-        <div class="rng"><input type="range" class="seek" min="0" max="1000" value="0" aria-label="Posisi lagu"></div>
+        <div class="rng bar-rng"><canvas class="spec bar-spec" aria-hidden="true"></canvas><input type="range" class="seek" min="0" max="1000" value="0" aria-label="Posisi lagu"></div>
         <span class="mono" data-np="left">0:00</span>
       </div>
     </div>
     <div class="right">
+      <button class="ib sm" data-act="pip" title="Mini player melayang (P)" aria-label="Mini player melayang"></button>
       <button class="ib sm" data-act="fx" title="Suara & equalizer (E)" aria-label="Suara dan equalizer"></button>
       <button class="ib sm" data-act="sleep" title="Timer tidur" aria-label="Timer tidur"></button>
       <button class="ib sm" data-act="lyrics" title="Lirik (L)" aria-label="Lirik"></button>
@@ -93,7 +94,7 @@
     <span class="np-grab" aria-hidden="true"></span>
     <button class="np-close ib" data-act="np" title="Tutup (Esc)" aria-label="Tutup"></button>
     <div class="np-left">
-      <div class="np-art"><img alt=""></div>
+      <div class="np-art-w"><canvas class="np-ring" aria-hidden="true"></canvas><div class="np-art"><img alt=""></div></div>
       <div class="np-meta">
         <div><div class="np-t" data-np="title"></div><div class="np-s" data-np="sub"></div></div>
         <button class="ib" data-act="love" aria-label="Suka"></button>
@@ -110,6 +111,7 @@
       <div class="np-vol">
         <button class="ib sm" data-act="mute" aria-label="Bisu"></button>
         <div class="rng"><input type="range" class="vol" min="0" max="100" value="80" aria-label="Volume"></div>
+        <button class="ib sm" data-act="share" aria-label="Bagikan"></button>
         <button class="ib sm" data-act="fx" aria-label="Suara dan equalizer"></button>
         <button class="ib sm" data-act="sleep" aria-label="Timer tidur"></button>
         <button class="ib sm" data-act="lyrics" aria-label="Lirik"></button>
@@ -123,6 +125,7 @@
   <div id="menu" class="menu" role="menu" hidden></div>
   <dialog id="keys" class="keys" aria-label="Shortcut keyboard"></dialog>
   <dialog id="fx" class="keys fx" aria-label="Pengaturan suara"></dialog>
+  <dialog id="share" class="keys share" aria-label="Bagikan"></dialog>
   <div id="toast" class="toast" role="status" hidden></div>
   <audio id="audio" preload="auto"></audio>
   <audio id="audio2" preload="auto"></audio>

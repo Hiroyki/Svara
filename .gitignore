@@ -10,3 +10,9 @@ windows/.stage/
 windows/payload.zip
 windows/payload.id
 windows/*.syso
+
+# video promo (gede, bukan bagian app)
+promo/
+windows/svara.ico
+windows/wizard.bmp
+windows/header.bmp
