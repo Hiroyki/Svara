@@ -51,7 +51,29 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 
 </div>
 
----
+<p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
+
+<details>
+<summary><b>📑 Table of contents</b></summary>
+<br>
+
+- [🎬 See it in action](#-see-it-in-action)
+- [🎧 What is Svara?](#-what-is-svara)
+- [📥 Download](#-download)
+- [💻 System requirements](#-system-requirements)
+- [📷 Screenshots](#-screenshots)
+- [🎥 Feature tour](#-feature-tour)
+- [✨ Features](#-features)
+- [💡 Tips & tricks](#-tips--tricks)
+- [🎹 Keyboard shortcuts](#-keyboard-shortcuts)
+- [🔒 Privacy](#-privacy)
+- [❓ FAQ](#-faq)
+- [🔧 How it works](#-how-it-works)
+- [🧰 Built with](#-built-with)
+- [🇮🇩 Made in Indonesia](#-made-in-indonesia)
+- [🤝 Contributing](#-contributing)
+
+</details>
 
 ## 🎬 See it in action
 
@@ -104,7 +126,19 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 
 </details>
 
-## 🖼️ Screenshots
+## 💻 System requirements
+
+| | Windows | macOS |
+| --- | --- | --- |
+| **OS** | Windows 10 or 11, 64-bit | macOS 13 Ventura or newer |
+| **Processor** | x64 (Intel or AMD) | Apple Silicon (M1 or newer) or Intel |
+| **Disk space** | about 400 MB | about 600 MB |
+| **Also needs** | Microsoft Edge WebView2 (built into Windows 11 and up-to-date Windows 10) | Nothing |
+| **Internet** | For streaming and search; offline songs play without it | Same |
+
+<p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
+
+## 📷 Screenshots
 
 <div align="center">
 
@@ -130,7 +164,7 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 
 </div>
 
-## 🎞️ Feature tour
+## 🎥 Feature tour
 
 <div align="center">
 
@@ -205,7 +239,18 @@ Share what you're listening to as a 1080×1920 card, ready for Instagram or What
 
 
 
-## ⌨️ Keyboard shortcuts
+## 💡 Tips & tricks
+
+- 🔀 **Smart shuffle**: click the shuffle button twice and Svara slips similar songs into your queue.
+- 🎤 **Jump with lyrics**: click any line in the synced lyrics to jump straight to that part of the song.
+- 🖱️ **Right-click a song** to play it next, add it to the queue or a playlist, download it for offline, or make a story card.
+- 💾 **Keep a mix you love**: hit **Save** in the queue to turn the whole mix into a playlist.
+- 🌙 **Sleep timer**: stop after 15, 30, 45 or 60 minutes, or at the end of the current song.
+- 📊 **Recap → playlist**: save your top songs from Svara Recap as a playlist in one click.
+- 🎛️ **Media keys work**: play/pause, next and previous from your keyboard's media keys or your headphones.
+- 🪟 **Close ≠ quit** on macOS: closing the window keeps the music going. Quit with <kbd>⌘Q</kbd>.
+
+## 🎹 Keyboard shortcuts
 
 | Key | Action | Key | Action |
 | --- | --- | --- | --- |
@@ -214,6 +259,8 @@ Share what you're listening to as a 1080×1920 card, ready for Instagram or What
 | <kbd>⇧</kbd> <kbd>→</kbd> <kbd>←</kbd> | Next / previous song | <kbd>E</kbd> | Sound & equalizer |
 | <kbd>↑</kbd> <kbd>↓</kbd> | Volume | <kbd>P</kbd> | Mini player |
 | <kbd>⌘K</kbd> / <kbd>/</kbd> | Search | <kbd>?</kbd> | All shortcuts |
+
+<p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
 
 ## 🔒 Privacy
 
@@ -293,6 +340,8 @@ You'll need the Xcode command line tools and `brew install uv go makensis`, plus
 
 </details>
 
+<p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
+
 ## 🧰 Built with
 
 <div align="center">
@@ -341,5 +390,9 @@ If Svara makes your day sound better, a ⭐ helps other people find it.
 **Svara** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Hiroyki/Svara/releases) · [Report a bug](https://github.com/Hiroyki/Svara/issues/new/choose) · MIT License
 
 <sub>Svara is not affiliated with YouTube or Google. For personal use.</sub>
+
+<br>
+
+<a href="#readme">⬆ Back to top</a>
 
 </div>
