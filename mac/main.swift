@@ -1,4 +1,4 @@
-// Senandung untuk Mac: jendela WebKit + server lokal yang ikut nyala & mati bareng app.
+// Svara untuk Mac: jendela WebKit + server lokal yang ikut nyala & mati bareng app.
 import Cocoa
 import WebKit
 
@@ -18,7 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
             contentRect: NSRect(x: 0, y: 0, width: 1360, height: 860),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered, defer: false)
-        window.title = "Senandung"
+        window.title = "Svara"
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.backgroundColor = bgColor
@@ -133,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
         env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         env["PUTAR_PORT"] = String(port)
         p.environment = env
-        let log = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/Senandung.log")
+        let log = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/Svara.log")
         FileManager.default.createFile(atPath: log.path, contents: nil)
         if let h = try? FileHandle(forWritingTo: log) {
             p.standardOutput = h
@@ -192,13 +192,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
             i.keyEquivalentModifierMask = m
             return i
         }
-        add("Senandung", [
-            it("Tentang Senandung", #selector(NSApplication.orderFrontStandardAboutPanel(_:)), ""),
+        add("Svara", [
+            it("Tentang Svara", #selector(NSApplication.orderFrontStandardAboutPanel(_:)), ""),
             .separator(),
-            it("Sembunyikan Senandung", #selector(NSApplication.hide(_:)), "h"),
+            it("Sembunyikan Svara", #selector(NSApplication.hide(_:)), "h"),
             it("Sembunyikan Lainnya", #selector(NSApplication.hideOtherApplications(_:)), "h", [.command, .option]),
             .separator(),
-            it("Keluar dari Senandung", #selector(NSApplication.terminate(_:)), "q"),
+            it("Keluar dari Svara", #selector(NSApplication.terminate(_:)), "q"),
         ])
         add("Edit", [
             it("Urungkan", Selector(("undo:")), "z"),
@@ -215,22 +215,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKUI
         ])
         add("Jendela", [
             it("Kecilkan", #selector(NSWindow.performMiniaturize(_:)), "m"),
-            it("Senandung", #selector(showMain), "1"),
+            it("Svara", #selector(showMain), "1"),
         ])
         NSApp.mainMenu = main
     }
 
     static let loadingHTML = """
-    <html><body style="margin:0;height:100vh;display:grid;place-items:center;background:#121118;color:#a29fb2;font:16px -apple-system,sans-serif">
-    <div style="text-align:center"><div style="width:14px;height:14px;margin:0 auto 14px;background:#ffc94a;animation:b 1s steps(2) infinite"></div>Lagi nyiapin Senandung…</div>
-    <style>@keyframes b{50%{opacity:.2}}</style></body></html>
+    <html><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0b0b0f;color:#a29fb2;font:16px -apple-system,sans-serif">
+    <div style="text-align:center"><div style="width:22px;height:22px;margin:0 auto 14px;border-radius:50%;border:3px solid #26262f;border-top-color:#ffc94a;animation:b .8s linear infinite"></div>Lagi nyiapin Svara…</div>
+    <style>@keyframes b{to{transform:rotate(360deg)}}</style></body></html>
     """
 
     static let errorHTML = """
-    <html><body style="margin:0;height:100vh;display:grid;place-items:center;background:#121118;color:#efedf5;font:15px -apple-system,sans-serif">
-    <div style="max-width:420px;text-align:center;line-height:1.5"><b style="font-size:18px">Server Senandung gagal nyala</b>
+    <html><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0b0b0f;color:#efedf5;font:15px -apple-system,sans-serif">
+    <div style="max-width:420px;text-align:center;line-height:1.5"><b style="font-size:18px">Server Svara gagal nyala</b>
     <p style="color:#a29fb2">Pastikan yt-dlp sama ffmpeg udah terpasang (brew install yt-dlp ffmpeg), terus buka ulang app-nya.
-    Catatan error ada di ~/Library/Logs/Senandung.log</p></div></body></html>
+    Catatan error ada di ~/Library/Logs/Svara.log</p></div></body></html>
     """
 }
 

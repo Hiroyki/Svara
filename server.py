@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Server lokal Senandung: nyajiin file web + jembatan YouTube Music (yt-dlp) + podcast (RSS).
+"""Server lokal Svara: nyajiin file web + jembatan YouTube Music (yt-dlp) + podcast (RSS).
 
 Jalanin: python3 server.py  (atau ./senandung)  lalu buka http://localhost:5560
 Cuma dengerin 127.0.0.1, jadi nggak kebuka ke jaringan.
@@ -403,8 +403,34 @@ def http_json(url, data=None, headers=None, timeout=15):
         return json.load(r)
 
 
-def ytm_call(endpoint, body):
-    body = {'context': {'client': {'clientName': 'WEB_REMIX', 'clientVersion': '1.20251020.01.00', 'hl': 'id', 'gl': 'ID'}}, **body}
+_region = {'at': 0, 'code': None, 'name': None}
+_region_lock = threading.Lock()
+
+
+def user_region():
+    """Negara pengguna menurut YouTube Music (dari IP), dibaca dari pilihan negara default di halaman chart."""
+    if _region['code'] and _region['at'] > time.time():
+        return _region
+    with _region_lock:
+        if _region['code'] and _region['at'] > time.time():
+            return _region
+        try:
+            data = ytm_call('browse', {'browseId': 'FEmusic_charts'}, region=False)
+            code = next((c['opaqueToken'] for c in find_all(data, 'musicFormBooleanChoice', []) if c.get('selected') and re.fullmatch(r'[A-Z]{2}', c.get('opaqueToken', ''))), None)
+            name = next((runs_text(b.get('title')) for b in find_all(data, 'musicSortFilterButtonRenderer', [])), None)
+            if code:
+                _region.update(code=code, name=name or code, at=time.time() + 6 * 3600)
+        except Exception:
+            _region['at'] = time.time() + 300  # coba lagi 5 menit lagi
+        return _region
+
+
+def ytm_call(endpoint, body, region=True):
+    # Bahasa tetap Indonesia (bahasa app), negara ikut lokasi pengguna
+    client = {'clientName': 'WEB_REMIX', 'clientVersion': '1.20251020.01.00', 'hl': 'id'}
+    if region and user_region()['code']:
+        client['gl'] = user_region()['code']
+    body = {'context': {'client': client}, **body}
     return http_json(f'https://music.youtube.com/youtubei/v1/{endpoint}?prettyPrint=false', json.dumps(body).encode(),
                      {'Content-Type': 'application/json', 'Origin': 'https://music.youtube.com', 'Referer': 'https://music.youtube.com/'})
 
@@ -484,6 +510,9 @@ def parse_two(it):
     bid, pt = first_browse(nav)
     if not bid:
         return None
+    # MPED + videoId = halaman satu video, bukan playlist; perlakukan sebagai lagu
+    if bid.startswith('MPED') and VID_RE.match(bid[4:]):
+        return {'type': 'song', 'vid': bid[4:], 'title': title, 'artist': sub.split(' • ')[0] if sub else '', 'album': '', 'duration': 0, 'art': art}
     return {'type': PAGE_KIND.get(pt, 'playlist'), 'id': bid, 'title': title, 'sub': sub, 'art': art}
 
 
@@ -615,6 +644,9 @@ def ytm_browse(bid):
             tracks = [x for x in items if x['type'] in ('song', 'episode')]
         else:
             shelves.append({'title': shelf_title(kind, sh), 'items': items[:24]})
+    if not tracks and bid.startswith('MPED') and VID_RE.match(bid[4:]):
+        # Halaman satu video: tampilkan videonya sebagai satu lagu, jangan kosong
+        tracks = [{'type': 'song', 'vid': bid[4:], 'title': title, 'artist': strap or sub, 'album': '', 'duration': 0, 'art': art}]
     kind = 'album' if bid.startswith('MPRE') else 'podcast' if bid.startswith('MPSP') else 'artist' if bid.startswith('UC') else 'playlist'
     out = {'id': bid, 'kind': kind, 'title': title, 'sub': ' • '.join(x for x in (strap, sub) if x), 'desc': desc[:900], 'art': art,
            'tracks': tracks, 'shelves': shelves}
@@ -624,10 +656,27 @@ def ytm_browse(bid):
 
 def ytm_radio(vid):
     """Lagu-lagu mirip buat radio otomatis (daftar 'berikutnya' YouTube Music)."""
-    hit = _browse_cache.get('radio:' + vid)
+    return ytm_upnext(vid)['items']
+
+
+def ytm_upnext(vid, pl='', params=''):
+    """Daftar 'Up next' YouTube Music: judul mix, chip suasana (Semua/Temukan/...), dan lagunya."""
+    key = f'upnext:{vid}|{pl}|{params}'
+    hit = _browse_cache.get(key)
     if hit and hit[0] > time.time():
         return hit[1]
-    data = ytm_call('next', {'videoId': vid, 'playlistId': 'RDAMVM' + vid, 'isAudioOnly': True})
+    body = {'videoId': vid, 'playlistId': pl or 'RDAMVM' + vid, 'isAudioOnly': True}
+    if params:
+        body['params'] = params
+    data = ytm_call('next', body)
+    head = next(iter(find_all(data, 'musicQueueHeaderRenderer', [])), {})
+    chips = []
+    for cl in find_all(data, 'subHeaderChipCloud', [])[:1]:
+        for c in cl.get('chipCloudRenderer', {}).get('chips', []):
+            r = c.get('chipCloudChipRenderer', {})
+            we = next(iter(find_all(r, 'watchEndpoint', [])), {})
+            if we.get('playlistId'):
+                chips.append({'label': runs_text(r.get('text')), 'pl': we['playlistId'], 'params': we.get('params', ''), 'on': bool(r.get('isSelected'))})
     out, seen = [], {vid}
     for it in find_all(data, 'playlistPanelVideoRenderer', []):
         v = it.get('videoId')
@@ -648,8 +697,9 @@ def ytm_radio(vid):
         dur = runs_text(it.get('lengthText'))
         out.append({'type': 'song', 'vid': v, 'title': runs_text(it.get('title')), 'artist': ', '.join(artists), 'artistId': artist_id,
                     'album': album, 'albumId': album_id, 'duration': parse_duration(dur) if DUR_RE.fullmatch(dur) else 0, 'art': thumb_of(it)})
-    _browse_cache['radio:' + vid] = (time.time() + 1800, out)
-    return out
+    res = {'title': runs_text(head.get('subtitle')), 'chips': chips, 'items': out}
+    _browse_cache[key] = (time.time() + 1800, res)
+    return res
 
 
 # ---------- lirik (LRCLIB) ----------
@@ -715,7 +765,7 @@ def itunes_shows(results):
 
 
 def pod_search(q):
-    url = 'https://itunes.apple.com/search?' + urllib.parse.urlencode({'media': 'podcast', 'entity': 'podcast', 'limit': 30, 'term': q, 'country': 'ID'})
+    url = 'https://itunes.apple.com/search?' + urllib.parse.urlencode({'media': 'podcast', 'entity': 'podcast', 'limit': 30, 'term': q, 'country': user_region()['code'] or 'US'})
     return itunes_shows(http_json(url).get('results', []))
 
 
@@ -723,9 +773,14 @@ def pod_top():
     hit = _feed_cache.get('__top__')
     if hit and hit[0] > time.time():
         return hit[1]
-    chart = http_json('https://rss.applemarketingtools.com/api/v2/id/podcasts/top/30/podcasts.json')
+    cc = (user_region()['code'] or 'US').lower()
+    try:
+        chart = http_json(f'https://rss.applemarketingtools.com/api/v2/{cc}/podcasts/top/30/podcasts.json')
+    except Exception:
+        cc = 'us'  # Apple belum punya chart podcast buat semua negara
+        chart = http_json('https://rss.applemarketingtools.com/api/v2/us/podcasts/top/30/podcasts.json')
     ids = [x['id'] for x in chart.get('feed', {}).get('results', [])]
-    shows = itunes_shows(http_json('https://itunes.apple.com/lookup?' + urllib.parse.urlencode({'id': ','.join(ids), 'country': 'ID'})).get('results', []))
+    shows = itunes_shows(http_json('https://itunes.apple.com/lookup?' + urllib.parse.urlencode({'id': ','.join(ids), 'country': cc.upper()})).get('results', []))
     order = {i: n for n, i in enumerate(ids)}
     shows.sort(key=lambda s: order.get(s['id'], 999))
     _feed_cache['__top__'] = (time.time() + 6 * 3600, shows)
@@ -882,7 +937,7 @@ def save_track(meta):
 # ---------- remote: app lain di Mac ini (mis. Nusa) bisa milih lagu ----------
 
 class Remote:
-    """Antrean perintah buat halaman Senandung + laporan antrean lagunya.
+    """Antrean perintah buat halaman Svara + laporan antrean lagunya.
 
     Perintah wajib bawa header X-Senandung-Remote, jadi halaman web lain nggak bisa ngirim
     (header khusus bikin browser minta izin CORS dulu, dan server ini nggak ngasih).
@@ -911,7 +966,8 @@ remote = Remote()
 class Handler(SimpleHTTPRequestHandler):
     # Registry Windows sering nyetel .js jadi text/plain, padahal <script type=module> nolak itu
     extensions_map = {**SimpleHTTPRequestHandler.extensions_map, '.js': 'text/javascript', '.css': 'text/css',
-                      '.html': 'text/html', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json'}
+                      '.html': 'text/html', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json',
+                      '.woff2': 'font/woff2'}
 
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=str(ROOT), **kw)
@@ -1102,6 +1158,11 @@ class Handler(SimpleHTTPRequestHandler):
             for r in [x for x in res if x.get('vid')][:3]:
                 bg(download, r['vid']) if kind == 'songs' else bg(fetch_head, r['vid'])
             return self.json(res)
+        if action == 'upnext' and VID_RE.match(arg('vid')):
+            res = ytm_upnext(arg('vid'), arg('pl') or '', arg('params') or '')
+            if res['items']:
+                bg(download, res['items'][0]['vid'])
+            return self.json(res)
         if action == 'radio' and VID_RE.match(arg('vid')):
             res = ytm_radio(arg('vid'))
             if res:
@@ -1109,6 +1170,9 @@ class Handler(SimpleHTTPRequestHandler):
             return self.json(res)
         if action == 'feed':
             return self.json(ytm_feed())
+        if action == 'region':
+            r = user_region()
+            return self.json({'code': r['code'], 'name': r['name']})
         if action == 'browse':
             d = ytm_browse(arg('id'))
             for t in d['tracks'][:3]:
@@ -1200,7 +1264,7 @@ if __name__ == '__main__':
         resolver.warm()
     srv = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
     srv.daemon_threads = True
-    print(f'Senandung jalan di http://localhost:{PORT}  (lagu YouTube disimpan ke {SAVE_DIR})')
+    print(f'Svara jalan di http://localhost:{PORT}  (lagu YouTube disimpan ke {SAVE_DIR})')
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bikin rsrc_windows_amd64.syso (ikon, manifest, info versi) buat dilink Go ke Senandung.exe.
+"""Bikin rsrc_windows_amd64.syso (ikon, manifest, info versi) buat dilink Go ke Svara.exe.
 
 Pakai: make_rsrc.py <logo.png> <keluaran.syso> <versi, mis. 1.0.0>
 """
@@ -15,7 +15,7 @@ SIZES = (16, 24, 32, 48, 64, 128, 256)
 
 MANIFEST = b'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity type="win32" name="Senandung" version="1.0.0.0" processorArchitecture="amd64"/>
+  <assemblyIdentity type="win32" name="Svara" version="1.0.0.0" processorArchitecture="amd64"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3"><security><requestedPrivileges>
     <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
   </requestedPrivileges></security></trustInfo>
@@ -79,9 +79,9 @@ def version_info(version):
     ms, ls = nums[0] << 16 | nums[1], nums[2] << 16 | nums[3]
     fixed = struct.pack('<13I', 0xFEEF04BD, 0x00010000, ms, ls, ms, ls, 0x3F, 0, 0x40004, 1, 0, 0, 0)
     fields = {
-        'CompanyName': 'Faquloh', 'FileDescription': 'Senandung', 'FileVersion': version,
-        'InternalName': 'Senandung', 'OriginalFilename': 'Senandung.exe',
-        'ProductName': 'Senandung', 'ProductVersion': version,
+        'CompanyName': 'Faquloh', 'FileDescription': 'Svara', 'FileVersion': version,
+        'InternalName': 'Svara', 'OriginalFilename': 'Svara.exe',
+        'ProductName': 'Svara', 'ProductVersion': version,
     }
     strings = [block(k, wstr(v), text=True, value_len=len(v) + 1) for k, v in fields.items()]
     table = block('040904B0', children=strings, text=True)

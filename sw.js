@@ -1,6 +1,6 @@
 // Network-first buat file aplikasi, fallback ke cache biar tetap kebuka offline
-const CACHE = 'senandung-v2';
-const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'db.js', 'favicon.png', 'assets/logo.png', 'assets/dengerin.png', 'assets/band.jpg', 'manifest.webmanifest'];
+const CACHE = 'svara-v12';
+const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'db.js', 'favicon.png', 'assets/logo.png', 'assets/dengerin.png', 'assets/band.jpg', 'assets/fonts/jakarta-latin.woff2', 'assets/fonts/jakarta-latin-ext.woff2', 'manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

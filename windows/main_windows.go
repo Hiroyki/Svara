@@ -1,4 +1,4 @@
-// Senandung untuk Windows: jendela WebView2 + server lokal yang ikut nyala & mati bareng app.
+// Svara untuk Windows: jendela WebView2 + server lokal yang ikut nyala & mati bareng app.
 // Python, yt-dlp, deno, dan ffmpeg dibundel di dalam exe, jadi nggak perlu pasang apa-apa.
 package main
 
@@ -24,7 +24,7 @@ import (
 const (
 	port    = "5560"
 	homeURL = "http://127.0.0.1:" + port + "/"
-	title   = "Senandung"
+	title   = "Svara"
 	// Halaman baru: petunjuk pintasan di kolom cari ditulis buat Mac
 	initJS = `addEventListener('DOMContentLoaded',()=>{const k=document.querySelector('.search kbd');if(k)k.textContent='Ctrl K'})`
 )
@@ -173,12 +173,12 @@ func boot(base, logPath string) error {
 }
 
 func page(body string) string {
-	return `<!doctype html><meta charset=utf-8><body style="margin:0;height:100vh;display:grid;place-items:center;background:#121118;color:#a29fb2;font:16px 'Segoe UI',sans-serif">` + body
+	return `<!doctype html><meta charset=utf-8><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0b0b0f;color:#a29fb2;font:16px 'Segoe UI',sans-serif">` + body
 }
 
 func errorPage(err error, logPath string) string {
 	esc := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
-	return page(`<div style="max-width:440px;text-align:center;line-height:1.5"><b style="font-size:18px;color:#efedf5">Senandung gagal nyala</b><p>` +
+	return page(`<div style="max-width:440px;text-align:center;line-height:1.5"><b style="font-size:18px;color:#efedf5">Svara gagal nyala</b><p>` +
 		esc.Replace(err.Error()) + `</p><p style="font-size:13px">Catatan error ada di ` + esc.Replace(logPath) + `</p></div>`)
 }
 
@@ -187,7 +187,7 @@ func main() {
 		return
 	}
 	if v, err := webviewloader.GetInstalledVersion(); err != nil || v == "" {
-		alert("Senandung butuh Microsoft Edge WebView2 Runtime.\n\nPasang dulu dari:\nhttps://developer.microsoft.com/microsoft-edge/webview2/")
+		alert("Svara butuh Microsoft Edge WebView2 Runtime.\n\nPasang dulu dari:\nhttps://developer.microsoft.com/microsoft-edge/webview2/")
 		return
 	}
 	base := filepath.Join(os.Getenv("LOCALAPPDATA"), "Senandung")
@@ -218,7 +218,7 @@ func main() {
 	darkTitleBar(uintptr(w.Window()))
 	w.SetSize(int(minW), int(minH), webview2.HintMin)
 	w.Init(initJS)
-	w.SetHtml(page(`<div style="text-align:center"><div style="width:14px;height:14px;margin:0 auto 14px;background:#ffc94a;animation:b 1s steps(2) infinite"></div>Lagi nyiapin Senandung…</div><style>@keyframes b{50%{opacity:.2}}</style>`))
+	w.SetHtml(page(`<div style="text-align:center"><div style="width:22px;height:22px;margin:0 auto 14px;border-radius:50%;border:3px solid #26262f;border-top-color:#ffc94a;animation:b .8s linear infinite"></div>Lagi nyiapin Svara…</div><style>@keyframes b{to{transform:rotate(360deg)}}</style>`))
 
 	go func() {
 		err := boot(base, logPath)

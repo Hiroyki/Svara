@@ -1,5 +1,5 @@
 #!/bin/sh
-# Bikin Senandung.exe (Windows x64) dari Mac. Hasil: dist-windows/Senandung.exe
+# Bikin Svara.exe (Windows x64) dari Mac. Hasil: dist-windows/Svara.exe
 # Python, yt-dlp, deno, dan ffmpeg ikut dibundel. Naikin versi di bawah kalau YouTube berubah.
 set -e
 cd "$(dirname "$0")"
@@ -42,6 +42,6 @@ shasum -a 256 windows/payload.zip | cut -c1-16 > windows/payload.id
 python3 windows/make_rsrc.py assets/logo.png windows/rsrc_windows_amd64.syso "$VERSION"
 
 mkdir -p dist-windows
-(cd windows && CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags '-H=windowsgui -s -w' -o ../dist-windows/Senandung.exe .)
+(cd windows && CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags '-H=windowsgui -s -w' -o ../dist-windows/Svara.exe .)
 rm -rf "$STAGE"
-ls -lh dist-windows/Senandung.exe
+ls -lh dist-windows/Svara.exe

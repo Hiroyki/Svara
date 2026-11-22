@@ -1,11 +1,11 @@
 #!/bin/sh
-# Bikin Senandung.app (native Mac) terus pasang ke ~/Applications
+# Bikin Svara.app (native Mac) terus pasang ke ~/Applications
 set -e
 cd "$(dirname "$0")"
-APP=dist/Senandung.app
+APP=dist/Svara.app
 rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/web" dist/AppIcon.iconset
 
-swiftc -O mac/main.swift -o "$APP/Contents/MacOS/Senandung" -framework Cocoa -framework WebKit
+swiftc -O mac/main.swift -o "$APP/Contents/MacOS/Svara" -framework Cocoa -framework WebKit
 
 cp index.html style.css app.js db.js sw.js manifest.webmanifest server.py ytworker.py favicon.png icon-192.png icon-512.png "$APP/Contents/Resources/web/"
 cp -R assets "$APP/Contents/Resources/web/"
@@ -30,10 +30,10 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-  <key>CFBundleName</key><string>Senandung</string>
-  <key>CFBundleDisplayName</key><string>Senandung</string>
+  <key>CFBundleName</key><string>Svara</string>
+  <key>CFBundleDisplayName</key><string>Svara</string>
   <key>CFBundleIdentifier</key><string>site.faquloh.senandung</string>
-  <key>CFBundleExecutable</key><string>Senandung</string>
+  <key>CFBundleExecutable</key><string>Svara</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>1.0</string>
@@ -46,7 +46,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 PLIST
 
 codesign --force --deep -s - "$APP"
-rm -rf "$HOME/Applications/Senandung.app"
+# App nama lama dibuang biar nggak dobel; bundle ID sama, jadi data tetap kebawa
+rm -rf "$HOME/Applications/Senandung.app" "$HOME/Applications/Svara.app"
 mkdir -p "$HOME/Applications"
 cp -R "$APP" "$HOME/Applications/"
-echo "Terpasang: $HOME/Applications/Senandung.app"
+echo "Terpasang: $HOME/Applications/Svara.app"

@@ -1,12 +1,12 @@
 {
-  "name": "Senandung",
-  "short_name": "Senandung",
+  "name": "Svara",
+  "short_name": "Svara",
   "description": "Pemutar musik pribadi tanpa iklan, lengkap sama lirik.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#121118",
-  "theme_color": "#121118",
+  "background_color": "#0b0b0f",
+  "theme_color": "#0b0b0f",
   "icons": [
     {
       "src": "icon-192.png",
