@@ -32,15 +32,12 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 
 <br>
 
-<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe"><img src="https://img.shields.io/badge/Download_for-Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white" height="42" alt="Download for Windows"></a>
-&nbsp;&nbsp;
-<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg"><img src="https://img.shields.io/badge/Download_for-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" height="42" alt="Download for macOS"></a>
-<br>
-<a href="#-download"><img src="https://img.shields.io/badge/Download_for-Linux-e95420?style=for-the-badge&logo=linux&logoColor=white" height="42" alt="Download for Linux"></a>
-&nbsp;&nbsp;
-<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk"><img src="https://img.shields.io/badge/Download_for-Android-3ddc84?style=for-the-badge&logo=android&logoColor=white" height="42" alt="Download for Android"></a>
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe"><img src="https://img.shields.io/badge/Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white" height="40" alt="Download for Windows"></a>
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg"><img src="https://img.shields.io/badge/macOS-111111?style=for-the-badge&logo=apple&logoColor=white" height="40" alt="Download for macOS"></a>
+<a href="#-download"><img src="https://img.shields.io/badge/Linux-e95420?style=for-the-badge&logo=linux&logoColor=white" height="40" alt="Download for Linux"></a>
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk"><img src="https://img.shields.io/badge/Android-3ddc84?style=for-the-badge&logo=android&logoColor=white" height="40" alt="Download for Android"></a>
 
-<sub>Windows 10/11 64-bit · macOS 13+ (Apple Silicon & Intel) · Linux x86_64 & arm64 · Android 7.0+ · nothing else to install</sub>
+<sub>Windows 10/11 · macOS 13+ · Linux x86_64 & arm64 · Android 7.0+ · all-in-one, nothing else to install</sub>
 
 <br><br>
 
@@ -51,9 +48,9 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 
 <br>
 
-| 🚫 **No ads** | 📝 **Karaoke lyrics** | 🎛️ **EQ + crossfade** | 💾 **Offline songs** | 🔒 **No account** |
-| :---: | :---: | :---: | :---: | :---: |
-| Just the music | Synced line by line | Gapless, 5-band | Saved to your disk | Everything stays local |
+| 🚫 **No ads** | 📝 **Karaoke lyrics** | 🎛️ **EQ + crossfade** | 💾 **Offline songs** | 🔒 **No account** | 📱 **Everywhere** |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| Just the music | Synced line by line | Gapless, 5-band | Saved to your disk | Everything stays local | Desktop and Android |
 
 </div>
 
@@ -67,6 +64,7 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 - [🎧 What is Svara?](#-what-is-svara)
 - [📥 Download](#-download)
 - [💻 System requirements](#-system-requirements)
+- [📱 Every platform, one player](#-every-platform-one-player)
 - [📷 Screenshots](#-screenshots)
 - [🎥 Feature tour](#-feature-tour)
 - [✨ Features](#-features)
@@ -100,13 +98,13 @@ There's no sign-up and no cloud: your library, playlists and listening history l
 | :---: | --- | --- | --- |
 | 🪟 | **Windows 10 / 11** (64-bit) | [**Svara-Setup-2.0.0.exe**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe) | ~100 MB |
 | 🍎 | **macOS 13 Ventura or newer** (Apple Silicon & Intel) | [**Svara-2.0.0.dmg**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | ~250 MB |
-| 🐧 | **Linux** Debian / Ubuntu / Mint (x86_64) | [**svara_2.0.0_amd64.deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_amd64.deb) | ~150 MB |
-| 🐧 | **Linux** Debian / Ubuntu / Raspberry Pi OS (arm64) | [**svara_2.0.0_arm64.deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_arm64.deb) | ~135 MB |
-| 🐧 | **Linux**, any distro (x86_64) | [**svara-2.0.0-linux-x86_64.tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-x86_64.tar.gz) | ~150 MB |
-| 🐧 | **Linux**, any distro (arm64) | [**svara-2.0.0-linux-arm64.tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-arm64.tar.gz) | ~135 MB |
+| 🐧 | **Linux**: Debian, Ubuntu, Mint, Pop!_OS, Raspberry Pi OS | [**amd64 .deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_amd64.deb) · [**arm64 .deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_arm64.deb) | ~150 MB |
+| 🐧 | **Linux**: Fedora, Arch, openSUSE and any other distro | [**x86_64 .tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-x86_64.tar.gz) · [**arm64 .tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-arm64.tar.gz) | ~150 MB |
 | 🤖 | **Android 7.0 or newer** (64-bit phones & tablets) | [**Svara-2.0.0.apk**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk) | ~30 MB |
 
 Every download is **all-in-one**: everything Svara needs (Python and yt-dlp, plus Deno and ffmpeg on desktop) is already inside. No Homebrew, no Terminal, no extra installs.
+
+> **Not sure which Linux file?** Run `uname -m`: `x86_64` means the amd64/x86_64 file, `aarch64` means arm64 (Raspberry Pi 4/5, ARM laptops). Pick the `.deb` if you use `apt`, the `.tar.gz` for everything else.
 
 <details open>
 <summary><b>🪟 Installing on Windows</b></summary>
@@ -188,6 +186,18 @@ Then open **Svara** from your app menu, or run `svara`.
 | **Disk space** | about 400 MB | about 600 MB | about 400 MB | about 120 MB |
 | **Also needs** | Microsoft Edge WebView2 (built into Windows 11 and up-to-date Windows 10) | Nothing | WebKitGTK, or a Chromium-based browser, or any browser | Android System WebView (preinstalled) |
 | **Internet** | For streaming and search; offline songs play without it | Same | Same | Same |
+
+## 📱 Every platform, one player
+
+Same interface, same features, same library format on every platform. Only the shell around it changes.
+
+| | 🪟 Windows | 🍎 macOS | 🐧 Linux | 🤖 Android |
+| --- | --- | --- | --- | --- |
+| **App window** | Go + WebView2 | Swift + WKWebView | WebKitGTK, or a Chromium app window | Java + Android WebView |
+| **Install** | Setup wizard, no admin | Drag into Applications | `.deb`, or `install.sh` without sudo | APK |
+| **Music in the background** | Keeps playing when minimised | Closing the window keeps it playing | Keeps playing while the window is open | Notification, lock screen and headset controls, screen off |
+| **Story cards** | Save or copy | Share sheet (AirDrop, Messages…) | Save to Downloads | Share sheet (Instagram, WhatsApp…), save to Pictures/Svara, copy |
+| **Offline songs** | `Music\Senandung` | `~/Music/Senandung` | `~/Music/Svara` | `Music/Svara` |
 
 <p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
 
@@ -312,7 +322,7 @@ Share what you're listening to as a 1080×1920 card, ready for Instagram or What
 | <kbd>→</kbd> <kbd>←</kbd> | Seek ±10 s | <kbd>M</kbd> | Mute |
 | <kbd>⇧</kbd> <kbd>→</kbd> <kbd>←</kbd> | Next / previous song | <kbd>E</kbd> | Sound & equalizer |
 | <kbd>↑</kbd> <kbd>↓</kbd> | Volume | <kbd>P</kbd> | Mini player |
-| <kbd>⌘K</kbd> / <kbd>/</kbd> | Search | <kbd>?</kbd> | All shortcuts |
+| <kbd>⌘K</kbd> / <kbd>Ctrl K</kbd> / <kbd>/</kbd> | Search | <kbd>?</kbd> | All shortcuts |
 
 <p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
 
@@ -347,6 +357,18 @@ As normal audio files you can also play elsewhere: <code>Music/Senandung</code> 
 <summary><b>How do I update?</b></summary>
 <br>
 Download the newest installer, package or APK from <a href="https://github.com/Hiroyki/Svara/releases">Releases</a> and install over the old one. Your library stays.
+</details>
+
+<details>
+<summary><b>Is Svara on the Play Store?</b></summary>
+<br>
+No. Install the APK from <a href="https://github.com/Hiroyki/Svara/releases/latest">Releases</a>. Android asks once to allow installs from your browser or file manager; that's normal for apps from outside the Play Store.
+</details>
+
+<details>
+<summary><b>On Linux, Svara opens in my browser instead of its own window. Why?</b></summary>
+<br>
+Svara's own window needs WebKitGTK. On Debian or Ubuntu: <code>sudo apt install python3-gi gir1.2-webkit2-4.1</code>, on Fedora: <code>sudo dnf install python3-gobject webkit2gtk4.1</code>, on Arch: <code>sudo pacman -S python-gobject webkit2gtk-4.1</code>. With Chrome, Chromium, Brave or Edge installed, Svara uses an app window from that browser instead.
 </details>
 
 <details>
