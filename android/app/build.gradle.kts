@@ -18,7 +18,11 @@ android {
         targetSdk = 36
         versionCode = 20000
         versionName = svaraVersion
-        ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
+        // Cuma arm64 (semua HP Android modern); Python 3.12 di Chaquopy nggak ada versi ARM 32-bit.
+        // x86_64 cuma buat emulator, jadi nggak ikut di APK rilis biar lebih kecil. Nyalain pakai:
+        // ./gradlew assembleRelease -Psvara.abis=arm64-v8a,x86_64
+        val abis = (project.findProperty("svara.abis") as String?) ?: "arm64-v8a"
+        ndk { abiFilters += abis.split(",").map { it.trim() }.filter { it.isNotEmpty() } }
     }
 
     signingConfigs {
@@ -42,7 +46,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 buang kode androidx yang nggak kepakai (method @JavascriptInterface udah dijaga aturan bawaan)
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -66,14 +73,13 @@ chaquopy {
         version = "3.12"
         System.getenv("SVARA_BUILD_PYTHON")?.let { buildPython(it) }
         pip {
-            // yt-dlp + dependensi murni-Python (brotli/pycryptodomex dilewati: opsional & butuh native)
+            // yt-dlp + dependensi murni-Python (brotli/pycryptodomex dilewati: opsional & butuh native).
+            // yt-dlp-ejs & websockets nggak dipasang: di Android nggak ada runtime JS, dan YouTube nggak butuh websocket
             install("yt-dlp")
-            install("yt-dlp-ejs")
             install("certifi")
             install("mutagen")
             install("requests")
             install("urllib3")
-            install("websockets")
         }
         extractPackages("certifi")
     }

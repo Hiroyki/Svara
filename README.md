@@ -100,7 +100,7 @@ There's no sign-up and no cloud: your library, playlists and listening history l
 | 🍎 | **macOS 13 Ventura or newer** (Apple Silicon & Intel) | [**Svara-2.0.0.dmg**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | ~250 MB |
 | 🐧 | **Linux**: Debian, Ubuntu, Mint, Pop!_OS, Raspberry Pi OS | [**amd64 .deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_amd64.deb) · [**arm64 .deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_arm64.deb) | ~150 MB |
 | 🐧 | **Linux**: Fedora, Arch, openSUSE and any other distro | [**x86_64 .tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-x86_64.tar.gz) · [**arm64 .tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-arm64.tar.gz) | ~150 MB |
-| 🤖 | **Android 7.0 or newer** (64-bit phones & tablets) | [**Svara-2.0.0.apk**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk) | ~30 MB |
+| 🤖 | **Android 7.0 or newer** (64-bit phones & tablets) | [**Svara-2.0.0.apk**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk) | ~20 MB |
 
 Every download is **all-in-one**: everything Svara needs (Python and yt-dlp, plus Deno and ffmpeg on desktop) is already inside. No Homebrew, no Terminal, no extra installs.
 
@@ -182,7 +182,7 @@ Then open **Svara** from your app menu, or run `svara`.
 | | Windows | macOS | Linux | Android |
 | --- | --- | --- | --- | --- |
 | **OS** | Windows 10 or 11, 64-bit | macOS 13 Ventura or newer | glibc 2.28+ (Debian 10, Ubuntu 20.04, Fedora 29 or newer) | Android 7.0 or newer |
-| **Processor** | x64 (Intel or AMD) | Apple Silicon (M1 or newer) or Intel | x86_64 or arm64 | arm64 (most phones) or x86_64 |
+| **Processor** | x64 (Intel or AMD) | Apple Silicon (M1 or newer) or Intel | x86_64 or arm64 | arm64 (64-bit phones) |
 | **Disk space** | about 400 MB | about 600 MB | about 400 MB | about 120 MB |
 | **Also needs** | Microsoft Edge WebView2 (built into Windows 11 and up-to-date Windows 10) | Nothing | WebKitGTK, or a Chromium-based browser, or any browser | Android System WebView (preinstalled) |
 | **Internet** | For streaming and search; offline songs play without it | Same | Same | Same |

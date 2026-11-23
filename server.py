@@ -38,7 +38,9 @@ IMG_CACHE = CACHE / 'img'
 SAVE_DIR = Path(os.environ.get('PUTAR_SAVE_DIR', Path.home() / 'Music' / 'Senandung'))
 # Android: folder Musik publik cuma boleh isi file audio, jadi indeksnya bisa ditaruh di tempat lain
 SAVED_INDEX = Path(os.environ.get('PUTAR_SAVED_INDEX') or SAVE_DIR / '.putar-saved.json')
-CACHE_LIMIT = 1024 * 1024 * 1024  # 1 GB
+# Android (PUTAR_INPROC) jalan di HP: RAM, CPU, kuota, dan penyimpanan lebih sempit
+LIGHT = os.environ.get('PUTAR_INPROC') == '1' or os.environ.get('PUTAR_LITE') == '1'
+CACHE_LIMIT = int(os.environ.get('PUTAR_CACHE_MB') or (300 if LIGHT else 1024)) * 1024 * 1024
 VID_RE = re.compile(r'^[A-Za-z0-9_-]{11}$')
 IMG_HOSTS = ('.googleusercontent.com', '.ytimg.com', '.ggpht.com', '.mzstatic.com')
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
@@ -122,10 +124,11 @@ class Resolver:
     def __init__(self):
         self.py = ytdlp_python()
         self.idle = queue.Queue()
-        self.size = 5 if self.py else 0
+        # Tiap worker = satu YoutubeDL (di desktop satu proses Python ~70 MB), jadi jangan kebanyakan
+        self.size = (2 if LIGHT else 3) if self.py else 0
         for _ in range(self.size):
             self.idle.put(None)  # worker dibikin pas pertama dipakai
-        self.bg_slots = threading.Semaphore(3)  # prefetch maksimal 3, sisanya buat klik
+        self.bg_slots = threading.Semaphore(1 if LIGHT else 2)  # sisanya buat klik
         self.cache = {}
         self.inflight = {}
         self.lock = threading.Lock()
@@ -154,7 +157,8 @@ class Resolver:
             self.idle.put(w)
 
     def warm(self, vid='jNQXAC9IVRw'):
-        """Nyalain semua worker sekaligus + sekali resolve, biar klik pertama nggak nunggu loading."""
+        """Nyalain worker dari awal + sekali resolve, biar klik pertama nggak nunggu loading.
+        Di HP cuma satu, biar pas app baru dibuka CPU-nya nggak langsung penuh."""
         def one():
             w = self.idle.get()
             try:
@@ -165,7 +169,7 @@ class Resolver:
                 w = None
             finally:
                 self.idle.put(w)
-        for _ in range(self.size):
+        for _ in range(1 if LIGHT else self.size):
             threading.Thread(target=one, daemon=True).start()
 
     def get(self, vid, urgent=True):
@@ -367,7 +371,7 @@ def fetch_head(vid):
     if total.isdigit():
         info['size'] = int(total)
     _heads[vid] = bytes(fix_moov(bytearray(data)))
-    while len(_heads) > 40:
+    while len(_heads) > (12 if LIGHT else 30):
         _heads.pop(next(iter(_heads)))
 
 
@@ -1216,9 +1220,10 @@ class Handler(SimpleHTTPRequestHandler):
             res = ytm_search(q, kind)
             if kind == 'songs' and not res:
                 res = ytm_search(q, 'videos')
-            # Hasil teratas langsung disiapin, biasanya itu yang diklik
-            for r in [x for x in res if x.get('vid')][:3]:
-                bg(download, r['vid']) if kind == 'songs' else bg(fetch_head, r['vid'])
+            # Hasil teratas langsung disiapin, biasanya itu yang diklik. Cuma yang pertama diunduh penuh
+            # (di HP nggak sama sekali, hemat kuota); sisanya cukup awalannya biar langsung bunyi
+            for i, r in enumerate([x for x in res if x.get('vid')][:(1 if LIGHT else 3)]):
+                bg(download, r['vid']) if kind == 'songs' and i == 0 and not LIGHT else bg(fetch_head, r['vid'])
             return self.json(res)
         if action == 'upnext' and VID_RE.match(arg('vid')):
             res = ytm_upnext(arg('vid'), arg('pl') or '', arg('params') or '')
@@ -1318,12 +1323,19 @@ def main():
         print('Catatan: worker yt-dlp cepat nggak aktif, pakai mode biasa (lebih lambat)')
     for part in AUDIO_CACHE.glob('*.part'):
         part.unlink(missing_ok=True)
-    # Benerin cache lama yang durasinya kebaca dobel di Mac
-    for f in AUDIO_CACHE.glob('*.m4a'):
-        fix_moov_file(f)
+    # Benerin cache lama yang durasinya kebaca dobel di Mac (sekali aja, bukan tiap app dibuka)
+    mark = CACHE / '.moov-fixed'
+    if not mark.exists():
+        for f in AUDIO_CACHE.glob('*.m4a'):
+            fix_moov_file(f)
+        try:
+            mark.touch()
+        except OSError:
+            pass
     # Panasin worker dari awal: lagu pertama nggak perlu nunggu yt-dlp loading
     if resolver.py:
-        resolver.warm()
+        # Di HP ditunda dikit: impor yt_dlp makan CPU & GIL, biar server + tampilan sempat nyala duluan
+        threading.Timer(4 if LIGHT else 0, resolver.warm).start()
     srv = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
     srv.daemon_threads = True
     print(f'Svara jalan di http://localhost:{PORT}  (lagu YouTube disimpan ke {SAVE_DIR})')

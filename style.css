@@ -1678,3 +1678,17 @@ body:not(.paused) .bar:not(.empty) .lcd-art { scale: calc(1 + var(--beat, 0) * 0
 canvas.bar-spec { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; }
 .share-hint { margin: 12px 0 0; text-align: center; font-size: 12.5px; color: var(--fg2); }
 .share-btns .btn:disabled { opacity: 0.55; pointer-events: none; }
+
+/* ---------- mode ringan (app Android & perangkat spek rendah) ----------
+   Blur gede, backdrop-filter, dan animasi tanpa henti itu yang paling makan GPU di WebView HP.
+   Tampilannya tetap sama warnanya, cuma latar-latarnya jadi diam. */
+html.lite *, html.lite *::before, html.lite *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.lite body::before { animation: none; inset: 0; }
+html.lite .np-bg img { inset: 0; width: 100%; height: 100%; transform: scale(1.2); filter: blur(28px) saturate(1.4); animation: none; will-change: auto; }
+html.lite .hero-bg img { filter: blur(24px) saturate(1.4); }
+html.lite .hh-bg i { filter: none; animation: none !important; will-change: auto; scale: none !important; }
+html.lite .hh-bgart { filter: blur(14px) saturate(1.4); }
+html.lite .hh-grain, html.lite .hello2::before, html.lite .hello2::after, html.lite .np-ring, html.lite .notes { display: none; }
+html.lite .ctl .ib.play::before, html.lite .np-ctl .ib.xxl::before, html.lite .vinyl, html.lite .hh-rings i, html.lite .hh-wave i { animation: none !important; }
+html.lite .menu { background: var(--raise); }
+html.lite .bar { background-color: var(--panel); }

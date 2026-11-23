@@ -30,7 +30,21 @@ const debounce = (fn, ms) => {
 };
 const nf = new Intl.NumberFormat('id-ID');
 const dateFmt = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const ANDROID = /SvaraAndroid/.test(navigator.userAgent);
+// Mode ringan: efek berat (blur, animasi, visualizer spektrum) dimatiin. Otomatis di app Android dan
+// perangkat spek rendah; bisa dipaksa nyala/mati dari panel Suara (disimpan di localStorage 'svara-lite').
+const litePref = () => { try { return localStorage.getItem('svara-lite') || 'auto'; } catch { return 'auto'; } };
+const liteAuto = ANDROID || (navigator.deviceMemory || 8) <= 4 || (navigator.hardwareConcurrency || 8) <= 4;
+let LITE = litePref() === 'auto' ? liteAuto : litePref() === 'on';
+document.documentElement.classList.toggle('lite', LITE);
+function setLite(on) {
+  try { on === liteAuto ? localStorage.removeItem('svara-lite') : localStorage.setItem('svara-lite', on ? 'on' : 'off'); } catch {}
+  LITE = on;
+  document.documentElement.classList.toggle('lite', LITE);
+}
+const motionMq = matchMedia('(prefers-reduced-motion: reduce)');
+// Di mode ringan animasi hiasan ikut dimatiin, sama kayak "kurangi gerakan" di sistem
+const reduceMotion = { get matches() { return LITE || motionMq.matches; } };
 const isMobile = () => matchMedia('(max-width: 760px)').matches;
 
 function hashStr(s) {
@@ -242,8 +256,11 @@ for (const ev of ['pointerdown', 'keydown']) document.addEventListener(ev, () =>
 const VIZ_N = 72;
 let vizRaf = 0, vizV = null, vizCol = null, vizColAt = 0;
 function vizStart() { if (!vizRaf) vizRaf = requestAnimationFrame(vizFrame); }
+let vizLast = 0;
 function vizFrame(now) {
   vizRaf = 0;
+  if (LITE && now - vizLast < 40) { if (!audio.paused) vizRaf = requestAnimationFrame(vizFrame); return; }
+  vizLast = now;
   const cvs = $$('canvas.spec').filter((c) => (c.closest('#np') ? npOpen() : c.offsetParent !== null));
   if (pipWin) cvs.push(...pipWin.document.querySelectorAll('canvas.spec'));
   if (!cvs.length && !npOpen()) return;
@@ -276,7 +293,7 @@ function vizFrame(now) {
   const d = durNow(), prog = d ? Math.min(1, posNow() / d) : 0;
   for (const c of cvs) drawWave(c, prog);
   beatTick(now, live);
-  if (npOpen()) drawRing();
+  if (npOpen() && !LITE) drawRing();
   hhFrame(now, live);
   if (playing || energy > 0.05) vizRaf = requestAnimationFrame(vizFrame);
 }
@@ -382,7 +399,7 @@ function applyEq() {
 // Graph Web Audio harus dibikin pas ada interaksi user, kalau nggak AudioContext-nya ketahan (suspended) dan jadi senyap
 // Di desktop graph selalu dipakai (buat visualizer); di iOS cuma kalau EQ nyala
 function wakeGraph() {
-  if ((DUAL || eqOn()) && !actx && (navigator.userActivation?.hasBeenActive ?? true)) graph();
+  if (((DUAL && !LITE) || eqOn()) && !actx && (navigator.userActivation?.hasBeenActive ?? true)) graph();
   if (actx?.state === 'suspended') actx.resume().catch(() => {});
 }
 const T = (id) => S.tr.get(id);
@@ -2527,6 +2544,7 @@ document.addEventListener('click', (e) => {
     if (k === 'hhnext') return next();
     if (k === 'hhcont') { if (cur()) return togglePlay(); const id = lastSong(); return id && playMix(id, [id], 0); }
     if (k === 'eqp') return setEq([...EQ_PRESETS[d.dataset.p][1]], d.dataset.p);
+    if (k === 'lite') { setLite(d.dataset.v === 'on'); drawFx(); return toast(LITE ? 'Mode ringan nyala' : 'Mode ringan mati'); }
     if (k === 'recapsave') { newPlaylist(ml, d.dataset.name); return toast('Top lagu disimpan jadi playlist'); }
     if (k === 'shuffleall') return playFrom(ml, 0, true);
     if (k === 'playcoll') return playColl(cid);
@@ -2623,6 +2641,16 @@ document.addEventListener('mouseover', (e) => {
   clearTimeout(hoverT);
   hoverT = setTimeout(() => prefetch(r.dataset.id), 80);
 });
+
+// Tombol back Android: tutup yang lagi kebuka dulu (dialog, menu, layar penuh). true = udah ditangani
+window.__svaraBack = () => {
+  const dlg = $$('dialog[open]').pop();
+  if (dlg) { dlg.close(); return true; }
+  if (!menuEl.hidden) { hideMenu(); return true; }
+  if (npOpen()) { openNp(false); return true; }
+  if (document.activeElement?.matches?.('input:not([type=range])')) { document.activeElement.blur(); return true; }
+  return false;
+};
 
 document.addEventListener('keydown', (e) => {
   const typing = e.target.closest?.('input:not([type=range]), [contenteditable]');
@@ -2864,7 +2892,8 @@ function drawFx() {
     inp.style.setProperty('--p', ((FX.bands[i] + 12) / 24) * 100 + '%');
     inp.previousElementSibling.textContent = (FX.bands[i] > 0 ? '+' : '') + FX.bands[i];
   });
-  $$('.eq-pre button', d).forEach((b) => b.classList.toggle('on', b.dataset.p === FX.eq));
+  $$('.eq-pre button[data-p]', d).forEach((b) => b.classList.toggle('on', b.dataset.p === FX.eq));
+  $$('[data-do=lite]', d).forEach((b) => b.classList.toggle('on', (b.dataset.v === 'on') === LITE));
 }
 function showFx() {
   const d = $('#fx');
@@ -2883,6 +2912,10 @@ function showFx() {
         <svg class="eq-curve" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="eqg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--amber)" stop-opacity=".55"/><stop offset="1" stop-color="var(--amber)" stop-opacity="0"/></linearGradient></defs><path class="eq-mid" d="M0 70H400"/><path class="eq-fill"/><path class="eq-line"/></svg>
         <div class="eq-bands">${BANDS.map(([, , l], i) => `<label><output></output><input type="range" min="-12" max="12" step="1" data-band="${i}" aria-label="${l} Hz"><span>${l}</span></label>`).join('')}</div>
       </div>
+    </section>
+    <section class="fx-sec">
+      <div class="fx-row"><span><b>Mode ringan</b><small>Matiin blur, animasi, dan visualizer biar hemat baterai &amp; nggak patah-patah${liteAuto ? '. Otomatis nyala di perangkat ini' : ''}</small></span></div>
+      <div class="eq-pre"><button data-do="lite" data-v="on">Nyala</button><button data-do="lite" data-v="off">Mati</button></div>
     </section>`;
   $('#xfR', d).addEventListener('input', (e) => { FX.xf = +e.target.value; saveFx(); renderFxBtn(); drawFx(); });
   $$('.eq-bands input', d).forEach((inp) => inp.addEventListener('input', () => {

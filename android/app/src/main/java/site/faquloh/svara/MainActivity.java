@@ -47,13 +47,15 @@ public class MainActivity extends Activity {
     private WebView web;
     private FrameLayout root;
     private String barColor = BG;
+    private boolean clearHistory = true;
+    private java.util.function.Consumer<String> sink;
     private final Handler main = new Handler(Looper.getMainLooper());
 
     /** Disuntik sebelum app.js jalan: Media Session + jembatan share versi Android. */
     private static final String SHIM = "(function(){\n" +
             "if (window.__svaraAndroid || !window.SvaraAndroid) return; window.__svaraAndroid = 1;\n" +
             "const B = window.SvaraAndroid, H = {};\n" +
-            "let md = null, st = 'none';\n" +
+            "let md = null, st = 'none', lp = null;\n" +
             "const push = () => { try { const a = md && md.artwork && md.artwork[0] ? md.artwork[0].src : '';\n" +
             "  B.media(md ? String(md.title || '') : '', md ? String(md.artist || '') : '', a, st === 'playing'); } catch (e) {} };\n" +
             "if (!window.MediaMetadata) window.MediaMetadata = class { constructor(i) { Object.assign(this, { title: '', artist: '', album: '', artwork: [] }, i || {}); } };\n" +
@@ -62,10 +64,16 @@ public class MainActivity extends Activity {
             "const set0 = ms.setActionHandler ? ms.setActionHandler.bind(ms) : null;\n" +
             "const pos0 = ms.setPositionState ? ms.setPositionState.bind(ms) : null;\n" +
             "ms.setActionHandler = (a, f) => { H[a] = f; try { set0 && set0(a, f); } catch (e) {} };\n" +
-            "ms.setPositionState = (s) => { try { pos0 && pos0(s); } catch (e) {} };\n" +
+            // Posisi dikirim ke notifikasi cuma kalau berubah beneran (seek, ganti lagu, play/pause),
+            // bukan tiap timeupdate: sistem udah ngitung majunya sendiri dari kecepatan putar
+            "ms.setPositionState = (s) => { try { pos0 && pos0(s); } catch (e) {}\n" +
+            "  try { if (!s || !(s.duration > 0)) return; const now = Date.now(), r = s.playbackRate || 1;\n" +
+            "    const exp = lp ? lp.p + (lp.st === 'playing' ? (now - lp.at) / 1000 * lp.r : 0) : -9;\n" +
+            "    if (lp && lp.d === s.duration && lp.r === r && lp.st === st && Math.abs(exp - s.position) < 1.5) return;\n" +
+            "    lp = { d: s.duration, p: s.position, r: r, at: now, st: st }; B.position(s.duration, s.position, r); } catch (e) {} };\n" +
             "Object.defineProperty(ms, 'metadata', { get: () => md, set: (v) => { md = v; push(); }, configurable: true });\n" +
             "Object.defineProperty(ms, 'playbackState', { get: () => st, set: (v) => { st = v; push(); }, configurable: true });\n" +
-            "window.__svaraMedia = (a) => { const f = H[a] || (a === 'pause' && H.play); if (f) f({ action: a }); };\n" +
+            "window.__svaraMedia = (a, t) => { const f = H[a] || (a === 'pause' && H.play); if (f) f({ action: a, seekTime: t }); };\n" +
             "window.webkit = window.webkit || {}; window.webkit.messageHandlers = window.webkit.messageHandlers || {};\n" +
             "window.webkit.messageHandlers.svaraShare = { postMessage: (m) => new Promise((res, rej) => {\n" +
             "  const r = B.share(JSON.stringify(m)); if (String(r).startsWith('error:')) rej(new Error(r.slice(6))); else res(r); }) };\n" +
@@ -132,11 +140,40 @@ public class MainActivity extends Activity {
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 if (!docStart && url.startsWith(Server.HOME)) view.evaluateJavascript(SHIM, null);
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // Halaman "Lagi nyiapin Svara…" jangan ada di riwayat, biar back nggak balik ke situ
+                if (clearHistory && url.startsWith(Server.HOME)) {
+                    clearHistory = false;
+                    view.clearHistory();
+                }
+            }
+
+            @Override
+            public boolean onRenderProcessGone(WebView view, android.webkit.RenderProcessGoneDetail detail) {
+                // Renderer WebView mati (kehabisan RAM dll.): jangan ikut force close, bikin ulang aja
+                if (view == web) {
+                    root.removeView(web);
+                    web.destroy();
+                    web = null;
+                    main.post(MainActivity.this::recreate);
+                }
+                return true;
+            }
         });
 
-        PlaybackService.sink = (a) -> main.post(() -> {
-            if (web != null) web.evaluateJavascript("window.__svaraMedia && window.__svaraMedia(" + JSONObject.quote(a) + ")", null);
+        PlaybackService.sink = sink = (a) -> main.post(() -> {
+            if (web == null) return;
+            String js;
+            if (a.startsWith("seekto:")) {
+                js = "window.__svaraMedia && window.__svaraMedia('seekto', " + Double.parseDouble(a.substring(7)) + ")";
+            } else {
+                js = "window.__svaraMedia && window.__svaraMedia(" + JSONObject.quote(a) + ")";
+            }
+            web.evaluateJavascript(js, null);
         });
+        registerBack();
 
         askPermissions();
         PlaybackService.start(this);
@@ -198,20 +235,41 @@ public class MainActivity extends Activity {
         WindowCompat.getInsetsController(getWindow(), decor).setAppearanceLightNavigationBars(light);
     }
 
+    /**
+     * Android 13+ pakai OnBackInvokedCallback; app yang target API 36 nggak dapet onBackPressed lagi
+     * di Android 16, jadi tanpa ini tombol back langsung keluar dari app.
+     */
+    private void registerBack() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::goBack);
+        }
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
-        if (web != null && web.canGoBack()) {
-            web.goBack();
-        } else {
-            // Jangan matiin musik: cukup pindah ke belakang kayak app musik lain
+        goBack();
+    }
+
+    /** Urutan: tutup dialog/menu/layar penuh di app.js → halaman sebelumnya → pindah ke belakang. */
+    private void goBack() {
+        if (web == null) {
             moveTaskToBack(true);
+            return;
         }
+        web.evaluateJavascript("window.__svaraBack ? window.__svaraBack() : false", (r) -> {
+            if ("true".equals(r) || web == null) return;
+            if (web.canGoBack()) web.goBack();
+            // Jangan matiin musik: cukup pindah ke belakang kayak app musik lain
+            else moveTaskToBack(true);
+        });
     }
 
     @Override
     protected void onDestroy() {
-        PlaybackService.sink = null;
+        // Activity baru (habis recreate) bisa udah masang sink-nya duluan: jangan dihapus
+        if (PlaybackService.sink == sink) PlaybackService.sink = null;
         if (web != null) {
             web.destroy();
             web = null;
@@ -224,6 +282,11 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void media(String title, String artist, String art, boolean playing) {
             PlaybackService.update(title, artist, art, playing);
+        }
+
+        @JavascriptInterface
+        public void position(double duration, double position, double rate) {
+            PlaybackService.position(duration, position, rate);
         }
 
         @JavascriptInterface
