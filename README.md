@@ -7,7 +7,7 @@
 
 <br>
 
-**An ad-free desktop music player for the YouTube Music catalogue.**
+**An ad-free music player for the YouTube Music catalogue, on desktop and Android.**
 <br>
 Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listening Recap
 
@@ -15,7 +15,7 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 
 [![Release](https://img.shields.io/github/v/release/Hiroyki/Svara?style=for-the-badge&color=ffc94a&label=release)](https://github.com/Hiroyki/Svara/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Hiroyki/Svara/total?style=for-the-badge&color=ff7a6b)](https://github.com/Hiroyki/Svara/releases)
-[![Platform](https://img.shields.io/badge/platform-Windows_·_macOS-b69cff.svg?style=for-the-badge)](#-download)
+[![Platform](https://img.shields.io/badge/platform-Windows_·_macOS_·_Linux_·_Android-b69cff.svg?style=for-the-badge)](#-download)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ddc6b.svg?style=for-the-badge)](LICENSE)
 <br>
 [![Build](https://img.shields.io/github/actions/workflow/status/Hiroyki/Svara/ci.yml?branch=main&style=flat-square&label=build&labelColor=1a1922)](https://github.com/Hiroyki/Svara/actions/workflows/ci.yml)
@@ -24,6 +24,8 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 [![Issues](https://img.shields.io/github/issues/Hiroyki/Svara?style=flat-square&color=b69cff&labelColor=1a1922)](https://github.com/Hiroyki/Svara/issues)
 ![Swift](https://img.shields.io/badge/Swift-macOS-f05138?style=flat-square&logo=swift&logoColor=white&labelColor=1a1922)
 ![Go](https://img.shields.io/badge/Go-Windows-00add8?style=flat-square&logo=go&logoColor=white&labelColor=1a1922)
+![Java](https://img.shields.io/badge/Java-Android-3ddc84?style=flat-square&logo=android&logoColor=white&labelColor=1a1922)
+![Shell](https://img.shields.io/badge/GTK-Linux-fcc624?style=flat-square&logo=linux&logoColor=black&labelColor=1a1922)
 ![Python](https://img.shields.io/badge/Python-server-3776ab?style=flat-square&logo=python&logoColor=white&labelColor=1a1922)
 ![JavaScript](https://img.shields.io/badge/JavaScript-UI-f7df1e?style=flat-square&logo=javascript&logoColor=black&labelColor=1a1922)
 [![Made in Indonesia](https://img.shields.io/badge/Made_in-Indonesia_🇮🇩-e11d48?style=flat-square&labelColor=1a1922)](#-made-in-indonesia)
@@ -33,8 +35,12 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 <a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe"><img src="https://img.shields.io/badge/Download_for-Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white" height="42" alt="Download for Windows"></a>
 &nbsp;&nbsp;
 <a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg"><img src="https://img.shields.io/badge/Download_for-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" height="42" alt="Download for macOS"></a>
+<br>
+<a href="#-download"><img src="https://img.shields.io/badge/Download_for-Linux-e95420?style=for-the-badge&logo=linux&logoColor=white" height="42" alt="Download for Linux"></a>
+&nbsp;&nbsp;
+<a href="https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk"><img src="https://img.shields.io/badge/Download_for-Android-3ddc84?style=for-the-badge&logo=android&logoColor=white" height="42" alt="Download for Android"></a>
 
-<sub>Windows 10/11 64-bit · macOS 13+ (Apple Silicon & Intel) · nothing else to install</sub>
+<sub>Windows 10/11 64-bit · macOS 13+ (Apple Silicon & Intel) · Linux x86_64 & arm64 · Android 7.0+ · nothing else to install</sub>
 
 <br><br>
 
@@ -84,9 +90,9 @@ Synced lyrics · crossfade · 5-band EQ · offline songs · podcasts · listenin
 
 ## 🎧 What is Svara?
 
-**Svara** is a music player for your computer that plays the whole YouTube Music catalogue without ads. Charts, moods, albums, artists, playlists and endless radio mixes, with lyrics that light up as the song plays, a proper equalizer, crossfade between songs, podcasts, and songs you can save to listen offline.
+**Svara** is a music player for your computer and your Android phone that plays the whole YouTube Music catalogue without ads. Charts, moods, albums, artists, playlists and endless radio mixes, with lyrics that light up as the song plays, a proper equalizer, crossfade between songs, podcasts, and songs you can save to listen offline.
 
-There's no sign-up and no cloud: your library, playlists and listening history live on your own computer.
+There's no sign-up and no cloud: your library, playlists and listening history live on your own device.
 
 ## 📥 Download
 
@@ -94,8 +100,13 @@ There's no sign-up and no cloud: your library, playlists and listening history l
 | :---: | --- | --- | --- |
 | 🪟 | **Windows 10 / 11** (64-bit) | [**Svara-Setup-2.0.0.exe**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-Setup-2.0.0.exe) | ~100 MB |
 | 🍎 | **macOS 13 Ventura or newer** (Apple Silicon & Intel) | [**Svara-2.0.0.dmg**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.dmg) | ~250 MB |
+| 🐧 | **Linux** Debian / Ubuntu / Mint (x86_64) | [**svara_2.0.0_amd64.deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_amd64.deb) | ~150 MB |
+| 🐧 | **Linux** Debian / Ubuntu / Raspberry Pi OS (arm64) | [**svara_2.0.0_arm64.deb**](https://github.com/Hiroyki/Svara/releases/latest/download/svara_2.0.0_arm64.deb) | ~135 MB |
+| 🐧 | **Linux**, any distro (x86_64) | [**svara-2.0.0-linux-x86_64.tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-x86_64.tar.gz) | ~150 MB |
+| 🐧 | **Linux**, any distro (arm64) | [**svara-2.0.0-linux-arm64.tar.gz**](https://github.com/Hiroyki/Svara/releases/latest/download/svara-2.0.0-linux-arm64.tar.gz) | ~135 MB |
+| 🤖 | **Android 7.0 or newer** (64-bit phones & tablets) | [**Svara-2.0.0.apk**](https://github.com/Hiroyki/Svara/releases/latest/download/Svara-2.0.0.apk) | ~30 MB |
 
-Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno and ffmpeg) is already inside. No Homebrew, no Terminal, no extra installs.
+Every download is **all-in-one**: everything Svara needs (Python and yt-dlp, plus Deno and ffmpeg on desktop) is already inside. No Homebrew, no Terminal, no extra installs.
 
 <details open>
 <summary><b>🪟 Installing on Windows</b></summary>
@@ -126,15 +137,57 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 
 </details>
 
+<details open>
+<summary><b>🐧 Installing on Linux</b></summary>
+
+<br>
+
+**Debian, Ubuntu, Mint, Pop!_OS, Raspberry Pi OS** (`.deb`):
+
+```sh
+sudo apt install ./svara_2.0.0_amd64.deb   # or svara_2.0.0_arm64.deb
+```
+
+**Any other distro** (`.tar.gz`, no sudo needed):
+
+```sh
+tar xf svara-2.0.0-linux-x86_64.tar.gz
+cd svara-2.0.0-linux-x86_64
+./install.sh            # adds Svara to your app menu and the `svara` command
+```
+
+Then open **Svara** from your app menu, or run `svara`.
+
+- Svara opens in its own window when WebKitGTK is installed (Debian/Ubuntu: `sudo apt install python3-gi gir1.2-webkit2-4.1`; the `.deb` pulls it in for you). Without it, Svara opens in Chrome, Chromium, Brave or Edge as an app window, or else in your default browser.
+- `svara --server` runs only the local server (then open `http://127.0.0.1:5560`); `svara --quit` stops it.
+- Uninstall: `sudo apt remove svara`, or `./install.sh --uninstall` for the `.tar.gz`. Your library stays in `~/.local/share/svara`.
+
+</details>
+
+<details open>
+<summary><b>🤖 Installing on Android</b></summary>
+
+<br>
+
+1. Download **`Svara-2.0.0.apk`** on your phone and open it.
+2. If Android asks, allow your browser or file manager to **install unknown apps**, then tap **Install**.
+3. Open Svara and allow notifications, so the player shows on your lock screen.
+
+- Music keeps playing when you leave the app or turn the screen off. Control it from the notification, the lock screen, or your headphones and Bluetooth buttons.
+- The back button sends Svara to the background without stopping the music. Swipe it away from Recents to quit.
+- Saved (offline) songs go to **Music/Svara**, so other music apps can see them too.
+
+</details>
+
 ## 💻 System requirements
 
-| | Windows | macOS |
-| --- | --- | --- |
-| **OS** | Windows 10 or 11, 64-bit | macOS 13 Ventura or newer |
-| **Processor** | x64 (Intel or AMD) | Apple Silicon (M1 or newer) or Intel |
-| **Disk space** | about 400 MB | about 600 MB |
-| **Also needs** | Microsoft Edge WebView2 (built into Windows 11 and up-to-date Windows 10) | Nothing |
-| **Internet** | For streaming and search; offline songs play without it | Same |
+| | Windows | macOS | Linux | Android |
+| --- | --- | --- | --- | --- |
+| **OS** | Windows 10 or 11, 64-bit | macOS 13 Ventura or newer | glibc 2.28+ (Debian 10, Ubuntu 20.04, Fedora 29 or newer) | Android 7.0 or newer |
+| **Processor** | x64 (Intel or AMD) | Apple Silicon (M1 or newer) or Intel | x86_64 or arm64 | arm64 (most phones) or x86_64 |
+| **Disk space** | about 400 MB | about 600 MB | about 400 MB | about 120 MB |
+| **Also needs** | Microsoft Edge WebView2 (built into Windows 11 and up-to-date Windows 10) | Nothing | WebKitGTK, or a Chromium-based browser, or any browser | Android System WebView (preinstalled) |
+| **Internet** | For streaming and search; offline songs play without it | Same | Same | Same |
 
 <p align="center"><img src="docs/divider.svg" width="100%" alt=""></p>
 
@@ -235,7 +288,7 @@ Both downloads are **all-in-one**: everything Svara needs (Python, yt-dlp, Deno 
 
 ## 📸 Story cards
 
-Share what you're listening to as a 1080×1920 card, ready for Instagram or WhatsApp stories. The card takes its colours from the album art, adds the lyric line you're on, and shows how far into the song you are. On macOS it opens the native share sheet (AirDrop, Messages, Photos…); you can also save or copy the image.
+Share what you're listening to as a 1080×1920 card, ready for Instagram or WhatsApp stories. The card takes its colours from the album art, adds the lyric line you're on, and shows how far into the song you are. On macOS and Android it opens the native share sheet (AirDrop, Messages, Instagram, WhatsApp…); you can also save or copy the image.
 
 
 
@@ -249,6 +302,7 @@ Share what you're listening to as a 1080×1920 card, ready for Instagram or What
 - 📊 **Recap → playlist**: save your top songs from Svara Recap as a playlist in one click.
 - 🎛️ **Media keys work**: play/pause, next and previous from your keyboard's media keys or your headphones.
 - 🪟 **Close ≠ quit** on macOS: closing the window keeps the music going. Quit with <kbd>⌘Q</kbd>.
+- 📱 **On Android**, the back button keeps the music going in the background; control it from the notification or the lock screen.
 
 ## 🎹 Keyboard shortcuts
 
@@ -266,8 +320,8 @@ Share what you're listening to as a 1080×1920 card, ready for Instagram or What
 
 - **No account, no sign-in.** Svara never asks for your Google login.
 - **No ads, no tracking, no analytics.**
-- Your library, playlists, history and Recap are stored **only on your computer**.
-- The app talks to a small server that runs **on your own machine**, which fetches the catalogue, lyrics and audio for you.
+- Your library, playlists, history and Recap are stored **only on your computer or phone**.
+- The app talks to a small server that runs **on your own device** (inside the app on Android), which fetches the catalogue, lyrics and audio for you.
 
 ## ❓ FAQ
 
@@ -286,19 +340,19 @@ No. Svara works without signing in to anything.
 <details>
 <summary><b>Where do saved (offline) songs go?</b></summary>
 <br>
-Into <code>Music/Senandung</code> in your home folder, as normal audio files you can also play elsewhere.
+As normal audio files you can also play elsewhere: <code>Music/Senandung</code> in your home folder on Windows and macOS, <code>~/Music/Svara</code> on Linux, and <b>Music/Svara</b> on Android.
 </details>
 
 <details>
 <summary><b>How do I update?</b></summary>
 <br>
-Download the newest installer from <a href="https://github.com/Hiroyki/Svara/releases">Releases</a> and install over the old one. Your library stays.
+Download the newest installer, package or APK from <a href="https://github.com/Hiroyki/Svara/releases">Releases</a> and install over the old one. Your library stays.
 </details>
 
 <details>
 <summary><b>A song won't play. What now?</b></summary>
 <br>
-YouTube changes things from time to time; a newer Svara release usually fixes it. On macOS the log lives at <code>~/Library/Logs/Svara.log</code>, on Windows at <code>%LOCALAPPDATA%\Senandung\senandung.log</code>. Please attach it when you open an issue.
+YouTube changes things from time to time; a newer Svara release usually fixes it. On macOS the log lives at <code>~/Library/Logs/Svara.log</code>, on Windows at <code>%LOCALAPPDATA%\Senandung\senandung.log</code>, on Linux at <code>~/.local/share/svara/svara.log</code>. On Android, <code>adb logcat -s python.stderr python.stdout Svara</code> shows it. Please attach it when you open an issue.
 </details>
 
 ## 🔧 How it works
@@ -306,23 +360,26 @@ YouTube changes things from time to time; a newer Svara release usually fixes it
 ```
 ┌──────────────────── Svara app window ────────────────────┐
 │   macOS: Swift + WKWebView     Windows: Go + WebView2    │
+│   Linux: WebKitGTK / Chromium  Android: Java + WebView   │
 │   ┌──────────── interface (HTML · CSS · JS) ───────────┐ │
 │   │  index.html · app.js · style.css · db.js (library) │ │
 │   └─────────────────────────┬──────────────────────────┘ │
 └─────────────────────────────┼────────────────────────────┘
-                              │  127.0.0.1:5560 (your machine only)
+                              │  127.0.0.1:5560 (your device only)
               ┌───────────────┴───────────────┐
               │  server.py (bundled Python)   │──► yt-dlp + Deno  → catalogue & audio
               │  lyrics · images · podcasts   │──► ffmpeg         → offline songs
               └───────────────────────────────┘──► RSS            → podcasts
 ```
 
+On Android the same `server.py` runs inside the app through [Chaquopy](https://chaquo.com/chaquopy/), with yt-dlp in-process. There's no Deno or ffmpeg there: Svara uses a YouTube client that needs no JavaScript runtime, and writes tags and cover art into offline songs with mutagen.
+
 <details>
 <summary><b>🛠️ Build it yourself</b></summary>
 
 <br>
 
-Both apps are built from a Mac:
+The macOS and Windows apps are built from a Mac:
 
 ```sh
 ./build-mac.sh       # → dist/Svara.app + dist/Svara-<version>.dmg
@@ -331,12 +388,23 @@ Both apps are built from a Mac:
 
 You'll need the Xcode command line tools and `brew install uv go makensis`, plus Pillow (`pip3 install pillow`). The scripts download Python, yt-dlp, Deno and ffmpeg for each platform and pack them into the app.
 
+The Linux packages and the Android APK can be built on Linux, macOS or Windows:
+
+```sh
+python3 build-linux.py   # → dist-linux/svara-<version>-linux-{x86_64,arm64}.tar.gz + svara_<version>_{amd64,arm64}.deb
+./build-android.sh       # → dist-android/Svara-<version>.apk
+```
+
+`build-linux.py` needs Python 3 with pip and `curl` (Pillow optional, for the icon). `build-android.sh` needs JDK 17+, the Android SDK (`ANDROID_HOME`, or `sdk.dir` in `android/local.properties`) and Python 3.12, which [Chaquopy](https://chaquo.com/chaquopy/) uses at build time. Without a keystore the APK is signed with the debug key; set `SVARA_KEYSTORE`, `SVARA_KEYSTORE_PASSWORD`, `SVARA_KEY_ALIAS` and `SVARA_KEY_PASSWORD` to sign a release.
+
 | Path | What |
 | --- | --- |
 | `index.html` · `app.js` · `style.css` · `db.js` | The interface (no framework, no build step) |
 | `server.py` · `ytworker.py` | Local server and always-warm yt-dlp workers |
 | `mac/main.swift` | macOS app: window, menus, server lifecycle, native share sheet |
 | `windows/` | Windows app (Go + WebView2) and the NSIS installer |
+| `linux/` | Linux launcher, WebKitGTK window, desktop entry and user installer |
+| `android/` | Android app (Java + WebView + Chaquopy): background playback, media notification, share sheet |
 
 </details>
 
@@ -346,7 +414,7 @@ You'll need the Xcode command line tools and `brew install uv go makensis`, plus
 
 <div align="center">
 
-<img src="https://skillicons.dev/icons?i=swift,go,python,js,html,css&theme=dark" alt="Swift, Go, Python, JavaScript, HTML, CSS">
+<img src="https://skillicons.dev/icons?i=swift,go,java,androidstudio,linux,python,js,html,css&theme=dark" alt="Swift, Go, Java, Android, Linux, Python, JavaScript, HTML, CSS">
 
 </div>
 
@@ -354,6 +422,8 @@ You'll need the Xcode command line tools and `brew install uv go makensis`, plus
 | :---: | --- | --- |
 | 🍎 | **Swift + WebKit** | The native macOS window, menus and share sheet |
 | 🪟 | **Go + WebView2** | The native Windows window, with Python, yt-dlp, Deno and ffmpeg embedded |
+| 🐧 | **WebKitGTK** | The Linux window, with Python, yt-dlp, Deno and ffmpeg bundled in `.deb` and `.tar.gz` |
+| 🤖 | **Java + Android WebView + [Chaquopy](https://chaquo.com/chaquopy/)** | The Android app, running the same Python server inside the app |
 | 🐍 | **Python + [yt-dlp](https://github.com/yt-dlp/yt-dlp)** | The local server that finds songs and streams audio |
 | ✨ | **Vanilla JS, HTML & CSS** | The whole interface: no framework, no build step |
 | 🎵 | **[LRCLIB](https://lrclib.net)** | Synced lyrics |

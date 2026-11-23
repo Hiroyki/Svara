@@ -1,0 +1,80 @@
+#!/bin/sh
+# Svara buat Linux: nyalain server.py (Python + yt-dlp + deno + ffmpeg bawaan), terus buka jendelanya.
+#   svara           buka Svara
+#   svara --server  cuma server-nya (buka sendiri http://127.0.0.1:5560 di browser)
+#   svara --quit    matiin server yang masih jalan
+HERE=$(dirname "$(readlink -f "$0")")
+PORT=${SVARA_PORT:-5560}
+URL="http://127.0.0.1:$PORT/"
+DATA="${XDG_DATA_HOME:-$HOME/.local/share}/svara"
+LOG="$DATA/svara.log"
+PIDF="$DATA/server.pid"
+PY="$HERE/runtime/python/bin/python3"
+mkdir -p "$DATA"
+
+ping() { "$PY" -I -c "import sys,urllib.request;urllib.request.urlopen(sys.argv[1]+'api/yt/ping',timeout=1)" "$URL" >/dev/null 2>&1; }
+
+stop_server() {
+  [ -f "$PIDF" ] && kill "$(cat "$PIDF")" 2>/dev/null
+  rm -f "$PIDF"
+}
+
+if [ "$1" = "--quit" ]; then stop_server; exit 0; fi
+
+OWNER=0
+if ! ping; then
+  MUSIC=$(xdg-user-dir MUSIC 2>/dev/null)
+  [ -n "$MUSIC" ] && [ "$MUSIC" != "$HOME" ] || MUSIC="$HOME/Music"
+  CERTS=$(ls "$HERE"/runtime/python/lib/python3.*/site-packages/certifi/cacert.pem 2>/dev/null | head -n1)
+  (
+    cd "$HERE/app" || exit 1
+    export PATH="$HERE/runtime/bin:$PATH" PUTAR_PYTHON="$PY" PUTAR_PORT="$PORT" \
+      PUTAR_SAVE_DIR="${SVARA_SAVE_DIR:-$MUSIC/Svara}" PYTHONNOUSERSITE=1
+    [ -n "$CERTS" ] && export SSL_CERT_FILE="$CERTS"
+    exec "$PY" -X utf8 server.py
+  ) >"$LOG" 2>&1 &
+  echo $! >"$PIDF"
+  OWNER=1
+  i=0
+  until ping; do
+    i=$((i + 1))
+    if [ $i -gt 300 ] || ! kill -0 "$(cat "$PIDF")" 2>/dev/null; then
+      echo "Svara gagal nyala, cek $LOG" >&2
+      command -v notify-send >/dev/null && notify-send "Svara gagal nyala" "Catatan error ada di $LOG"
+      stop_server
+      exit 1
+    fi
+    sleep 0.2
+  done
+fi
+
+if [ "$1" = "--server" ]; then
+  echo "Svara jalan di $URL (Ctrl+C buat berhenti)"
+  trap 'stop_server; exit 0' INT TERM
+  wait
+  exit 0
+fi
+
+cleanup() { [ $OWNER = 1 ] && stop_server; }
+trap 'cleanup; exit 0' INT TERM
+
+# 1) Jendela sendiri lewat WebKitGTK (python3-gi + gir1.2-webkit2-4.1 / gir1.2-webkit-6.0)
+if [ -z "$SVARA_BROWSER" ] && [ -x /usr/bin/python3 ] && /usr/bin/python3 "$HERE/svara-window.py" --check >/dev/null 2>&1; then
+  /usr/bin/python3 "$HERE/svara-window.py" "$URL" "$DATA" "$HERE/svara.png"
+  cleanup
+  exit 0
+fi
+
+# 2) Browser keluarga Chromium dalam mode app (profil sendiri, jadi nunggu sampai jendelanya ditutup)
+for b in ${SVARA_BROWSER:-} google-chrome-stable google-chrome chromium chromium-browser brave-browser microsoft-edge-stable microsoft-edge vivaldi-stable; do
+  if command -v "$b" >/dev/null 2>&1; then
+    "$b" --app="$URL" --user-data-dir="$DATA/browser" --class=Svara --no-first-run --no-default-browser-check \
+      --autoplay-policy=no-user-gesture-required --disable-background-timer-throttling >/dev/null 2>&1
+    cleanup
+    exit 0
+  fi
+done
+
+# 3) Browser bawaan: server dibiarin jalan, matiin pakai: svara --quit
+xdg-open "$URL" >/dev/null 2>&1 &
+echo "Svara kebuka di browser. Server tetap jalan; matiin pakai: svara --quit"

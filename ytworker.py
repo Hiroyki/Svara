@@ -2,6 +2,9 @@
 
 Baca satu baris JSON {"vid": "..."} dari stdin, balas satu baris JSON berisi URL audio.
 Karena prosesnya nggak mati, resolve lagu berikutnya cuma ~1 detik, bukan 4.
+
+Di Android nggak bisa bikin proses Python baru, jadi server.py ngimpor modul ini
+dan manggil make_ydl() + resolve() langsung di thread-nya sendiri.
 """
 import json
 import os
@@ -9,19 +12,23 @@ import sys
 
 import yt_dlp
 
-opts = {
-    'quiet': True,
-    'no_warnings': True,
-    'noprogress': True,
-    'noplaylist': True,
-    'format': 'bestaudio[ext=m4a]/bestaudio',
-    # Client bawaan yt-dlp baru (tv_samsung) ngasih URL yang 403 beberapa detik pertama
-    'extractor_args': {'youtube': {'player_client': ['visionos', 'web']}},
-}
-if os.environ.get('PUTAR_COOKIES'):
-    opts['cookiesfrombrowser'] = (os.environ['PUTAR_COOKIES'],)
 
-ydl = yt_dlp.YoutubeDL(opts)
+def make_ydl():
+    opts = {
+        'quiet': True,
+        'no_warnings': True,
+        'noprogress': True,
+        'noplaylist': True,
+        'format': 'bestaudio[ext=m4a]/bestaudio',
+        # Client bawaan yt-dlp baru (tv_samsung) ngasih URL yang 403 beberapa detik pertama
+        'extractor_args': {'youtube': {'player_client': ['visionos', 'web']}},
+    }
+    if os.environ.get('PUTAR_NO_JS'):
+        # Nggak ada runtime JS (Android): visionos nggak butuh JS player, cukup itu aja
+        opts['extractor_args']['youtube']['player_client'] = ['visionos']
+    if os.environ.get('PUTAR_COOKIES'):
+        opts['cookiesfrombrowser'] = (os.environ['PUTAR_COOKIES'],)
+    return yt_dlp.YoutubeDL(opts)
 
 
 def videos(info):
@@ -38,11 +45,11 @@ def videos(info):
     return {str(h): {'url': f['url'], 'headers': f.get('http_headers') or {}, 'size': f.get('filesize') or 0, 'tbr': f.get('tbr') or 0}
             for h, f in best.items()}
 
-for line in sys.stdin:
+
+def resolve(ydl, vid):
     try:
-        vid = json.loads(line)['vid']
         info = ydl.extract_info(f'https://music.youtube.com/watch?v={vid}', download=False)
-        out = {
+        return {
             'ok': True,
             'url': info['url'],
             'headers': info.get('http_headers') or {},
@@ -53,6 +60,15 @@ for line in sys.stdin:
         }
     except Exception as e:
         msg = str(e).strip().splitlines()[-1] if str(e).strip() else 'yt-dlp gagal'
-        out = {'ok': False, 'error': msg}
-    sys.stdout.write(json.dumps(out) + '\n')
-    sys.stdout.flush()
+        return {'ok': False, 'error': msg}
+
+
+if __name__ == '__main__':
+    ydl = make_ydl()
+    for line in sys.stdin:
+        try:
+            out = resolve(ydl, json.loads(line)['vid'])
+        except Exception as e:
+            out = {'ok': False, 'error': str(e) or 'request rusak'}
+        sys.stdout.write(json.dumps(out) + '\n')
+        sys.stdout.flush()

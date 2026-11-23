@@ -17,3 +17,10 @@ windows/svara.ico
 windows/wizard.bmp
 windows/header.bmp
 mac/.cache/
+dist-android/
+dist-linux/
+linux/.cache/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties

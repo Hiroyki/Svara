@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Android app (Android 7.0+, arm64 & x86_64): the same interface in a WebView with the Python server running inside the app (Chaquopy). Background playback with a media notification and lock-screen, headset and Bluetooth controls; offline songs saved to Music/Svara; story cards through the Android share sheet.
+- Linux packages for x86_64 and arm64: `.deb` and a portable `.tar.gz` with a no-sudo installer. Python, yt-dlp, Deno and ffmpeg are bundled; Svara opens in a WebKitGTK window, a Chromium app window, or your browser.
+- `build-android.sh` and `build-linux.py`.
+
+### Changed
+- `server.py` can run yt-dlp in-process (`PUTAR_INPROC=1`) and save offline songs without ffmpeg, writing tags and cover art with mutagen.
+- The Linux cache lives in `~/.cache/svara`.
+
 ## [2.0.0](https://github.com/Hiroyki/Svara/releases/tag/v2.0.0) · 2026-11-22
 
 A complete rewrite: a lighter, faster desktop player with native apps for Windows and macOS.

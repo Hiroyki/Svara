@@ -29,12 +29,15 @@ if os.environ.get('PUTAR_CACHE_DIR'):
     CACHE = Path(os.environ['PUTAR_CACHE_DIR'])
 elif sys.platform == 'win32':
     CACHE = Path(os.environ.get('LOCALAPPDATA') or Path.home() / 'AppData' / 'Local') / 'Senandung' / 'cache'
-else:
+elif sys.platform == 'darwin':
     CACHE = Path.home() / 'Library' / 'Caches' / 'putar'
+else:
+    CACHE = Path(os.environ.get('XDG_CACHE_HOME') or Path.home() / '.cache') / 'svara'
 AUDIO_CACHE = CACHE / 'audio'
 IMG_CACHE = CACHE / 'img'
 SAVE_DIR = Path(os.environ.get('PUTAR_SAVE_DIR', Path.home() / 'Music' / 'Senandung'))
-SAVED_INDEX = SAVE_DIR / '.putar-saved.json'
+# Android: folder Musik publik cuma boleh isi file audio, jadi indeksnya bisa ditaruh di tempat lain
+SAVED_INDEX = Path(os.environ.get('PUTAR_SAVED_INDEX') or SAVE_DIR / '.putar-saved.json')
 CACHE_LIMIT = 1024 * 1024 * 1024  # 1 GB
 VID_RE = re.compile(r'^[A-Za-z0-9_-]{11}$')
 IMG_HOSTS = ('.googleusercontent.com', '.ytimg.com', '.ggpht.com', '.mzstatic.com')
@@ -43,7 +46,9 @@ TYPES = {'.m4a': 'audio/mp4', '.webm': 'audio/webm', '.opus': 'audio/ogg', '.mp3
 
 # App Windows bawa Python + yt_dlp sendiri, nggak ada perintah yt-dlp di PATH
 BUNDLED_PY = os.environ.get('PUTAR_PYTHON', '').strip()
-YTDLP = BUNDLED_PY or shutil.which('yt-dlp')
+# Android: nggak bisa bikin proses baru, yt_dlp diimpor langsung di proses ini
+INPROC = os.environ.get('PUTAR_INPROC') == '1'
+YTDLP = BUNDLED_PY or ('inproc' if INPROC else None) or shutil.which('yt-dlp')
 FFMPEG = shutil.which('ffmpeg')
 # Opsional: pakai login YouTube dari browser (mis. PUTAR_COOKIES=chrome) buat lagu yang minta login
 COOKIES = os.environ.get('PUTAR_COOKIES', '').strip()
@@ -54,6 +59,8 @@ for d in (AUDIO_CACHE, IMG_CACHE):
 
 def ytdlp_python():
     """Python milik instalasi yt-dlp (brew pakai venv sendiri), biar bisa `import yt_dlp`."""
+    if INPROC:
+        return 'inproc'
     if BUNDLED_PY:
         return BUNDLED_PY
     if not YTDLP:
@@ -71,7 +78,28 @@ def ytdlp_python():
 
 # ---------- pool worker yt-dlp (nyala terus = resolve ~1 detik) ----------
 
+class InprocWorker:
+    """Kayak Worker, tapi yt_dlp jalan di proses ini (satu YoutubeDL per worker, nggak thread-safe)."""
+
+    def __init__(self):
+        import ytworker
+        self.mod = ytworker
+        self.ydl = ytworker.make_ydl()
+        self.p = self
+
+    def poll(self):
+        return None
+
+    def ask(self, vid):
+        return self.mod.resolve(self.ydl, vid)
+
+
 class Worker:
+    def __new__(cls, py):
+        if py == 'inproc':
+            return InprocWorker()
+        return super().__new__(cls)
+
     def __init__(self, py):
         env = dict(os.environ)
         if COOKIES:
@@ -876,6 +904,34 @@ def safe_name(s):
     return s
 
 
+def save_without_ffmpeg(src, dest, meta, vid, cover):
+    """Tanpa ffmpeg (Android): salin file audionya apa adanya, tag + cover ditulis pakai mutagen."""
+    if src.suffix != '.m4a':
+        dest = dest.with_suffix(src.suffix)
+    tmp = dest.with_name(dest.stem + '.tmp' + dest.suffix)
+    shutil.copyfile(src, tmp)
+    try:
+        if src.suffix == '.m4a':
+            from mutagen.mp4 import MP4, MP4Cover
+            f = MP4(str(tmp))
+            artist = meta.get('artist') or ''
+            for k, v in (('\xa9nam', meta.get('title')), ('\xa9ART', artist), ('aART', artist.split(',')[0]),
+                         ('\xa9alb', meta.get('album') or meta.get('title')), ('\xa9cmt', f'youtube:{vid}')):
+                if v:
+                    f[k] = [v]
+            if cover:
+                data = Path(cover).read_bytes()
+                if data[:4] == b'\x89PNG':
+                    f['covr'] = [MP4Cover(data, imageformat=MP4Cover.FORMAT_PNG)]
+                elif data[:3] == b'\xff\xd8\xff':
+                    f['covr'] = [MP4Cover(data, imageformat=MP4Cover.FORMAT_JPEG)]
+            f.save()
+    except Exception as e:
+        print('tag lagu gagal ditulis:', e)
+    tmp.replace(dest)
+    return dest
+
+
 def save_track(meta):
     vid = meta.get('vid', '')
     if not VID_RE.match(vid):
@@ -916,6 +972,12 @@ def save_track(meta):
                  ('album', meta.get('album') or meta.get('title')), ('comment', f'youtube:{vid}')):
         if v:
             tags += ['-metadata', f'{k}={v}']
+    if not FFMPEG:
+        dest = save_without_ffmpeg(src, dest, meta, vid, cover)
+        saved[vid] = {'path': str(dest), 'title': meta.get('title'), 'artist': meta.get('artist'), 'album': meta.get('album'),
+                      'art': meta.get('art'), 'duration': meta.get('duration') or 0, 'at': int(time.time() * 1000)}
+        SAVED_INDEX.write_text(json.dumps(saved, ensure_ascii=False, indent=1), encoding='utf-8')
+        return str(dest)
     audio_codec = ['-c:a', 'copy'] if src.suffix == '.m4a' else ['-c:a', 'aac', '-b:a', '192k']
     tmp = dest.with_suffix('.tmp.m4a')
     if cover:
@@ -1249,9 +1311,9 @@ class Handler(SimpleHTTPRequestHandler):
             return self.json({'error': str(e)}, 500)
 
 
-if __name__ == '__main__':
+def main():
     if not YTDLP:
-        print('Peringatan: yt-dlp nggak ketemu, fitur YouTube mati. Pasang: brew install yt-dlp')
+        print('Peringatan: yt-dlp nggak ketemu, fitur YouTube mati. Pasang yt-dlp dulu (mis. pip install yt-dlp)')
     elif not resolver.py:
         print('Catatan: worker yt-dlp cepat nggak aktif, pakai mode biasa (lebih lambat)')
     for part in AUDIO_CACHE.glob('*.part'):
@@ -1269,3 +1331,7 @@ if __name__ == '__main__':
         srv.serve_forever()
     except KeyboardInterrupt:
         pass
+
+
+if __name__ == '__main__':
+    main()

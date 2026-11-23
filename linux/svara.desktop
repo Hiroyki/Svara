@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Svara
+GenericName=Music Player
+Comment=Ad-free music player for the YouTube Music catalogue
+Exec=svara
+Icon=svara
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+Keywords=music;youtube;lyrics;podcast;
+StartupWMClass=Svara
