@@ -2784,11 +2784,28 @@ if (/SvaraAndroid/.test(navigator.userAgent)) {
     for (; el && el !== document.body && el !== document.documentElement; el = el.parentElement) if (canScroll(el, axis)) return el;
     return null;
   };
+  // Selama digeser manual, scroll-snap dimatiin: tiap ubah scrollLeft dari kode, Chrome nge-snap balik
+  // ke kartu terdekat, jadi baris kartu kerasa nyangkut. Dibalikin lagi pas geseran/lemparan selesai.
+  let unsnap = null;
+  const release = () => { if (unsnap) { unsnap(); unsnap = null; } };
+  const hold = (el) => {
+    release();
+    const prev = el.style.scrollSnapType;
+    el.style.scrollSnapType = 'none';
+    unsnap = () => { el.style.scrollSnapType = prev; };
+  };
+  // Auto-scroll lirik cuma ngalah ke wheel/touchmove; geseran manual ini juga harus dihitung
+  const scrollBy = (g, v) => {
+    if (g.axis === 'y') g.el.scrollTop -= v; else g.el.scrollLeft -= v;
+    if (g.lyr) userScrollUntil = Date.now() + 3000;
+  };
   document.addEventListener('pointerdown', (e) => {
     cancelAnimationFrame(fling);
+    release();
+    eatClick = false;
     d = null;
     if (e.pointerType === 'touch' || e.button !== 0 || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
-    d = { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, vy: 0, target: e.target, el: null, axis: null };
+    d = { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, vy: 0, target: e.target, el: null, axis: null, lyr: false };
   }, { capture: true, passive: true });
   document.addEventListener('pointermove', (e) => {
     if (!d) return;
@@ -2802,11 +2819,13 @@ if (/SvaraAndroid/.test(navigator.userAgent)) {
       // Geser horizontal di dalam daftar vertikal (atau sebaliknya): pakai sumbu yang emang bisa digulir
       if (!d.el) { d.axis = pref === 'y' ? 'x' : 'y'; d.el = findScroller(d.target, d.axis); }
       if (!d.el) { d = null; return; }
+      d.lyr = !!d.el.closest('#npRight');
+      hold(d.el);
     }
     const dx = e.clientX - d.x;
     const dy = e.clientY - d.y;
     const dt = Math.max(1, e.timeStamp - d.t);
-    if (d.axis === 'y') d.el.scrollTop -= dy; else d.el.scrollLeft -= dx;
+    scrollBy(d, d.axis === 'y' ? dy : dx);
     d.vx = 0.8 * (dx / dt) + 0.2 * d.vx;
     d.vy = 0.8 * (dy / dt) + 0.2 * d.vy;
     d.x = e.clientX;
@@ -2818,14 +2837,15 @@ if (/SvaraAndroid/.test(navigator.userAgent)) {
     const g = d;
     d = null;
     if (!g.el) return;
+    // Klik yang nyusul pointerup ini dibuang; pointerdown berikutnya ngereset, jadi tap baru nggak ikut ketelan
     eatClick = e.type === 'pointerup';
-    setTimeout(() => (eatClick = false), 400);
     let v = (g.axis === 'y' ? g.vy : g.vx) * 16;
-    if (e.timeStamp - g.t > 100 || Math.abs(v) < 2) return;
+    if (e.timeStamp - g.t > 100 || Math.abs(v) < 2) return release();
     const step = () => {
-      if (g.axis === 'y') g.el.scrollTop -= v; else g.el.scrollLeft -= v;
+      scrollBy(g, v);
       v *= 0.95;
       if (Math.abs(v) > 0.5) fling = requestAnimationFrame(step);
+      else release();
     };
     fling = requestAnimationFrame(step);
   };
@@ -2838,8 +2858,10 @@ if (/SvaraAndroid/.test(navigator.userAgent)) {
     e.preventDefault();
     e.stopPropagation();
   }, true);
-  // Baris lagu draggable="true": dari mouse/stylus, drag HTML5 bakal nyerobot geseran, jadi dimatiin
+  // Baris lagu draggable="true": dari mouse/stylus, drag HTML5 bakal nyerobot geseran, jadi dimatiin.
+  // Begitu juga blok teks (judul halaman bisa diblok) biar nggak ikut keblok waktu digeser.
   document.addEventListener('dragstart', (e) => { if (d) e.preventDefault(); }, true);
+  document.addEventListener('selectstart', (e) => { if (d) e.preventDefault(); }, true);
 }
 
 let toastT;
