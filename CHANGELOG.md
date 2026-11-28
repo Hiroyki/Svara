@@ -18,6 +18,7 @@
 ### Fixed
 - Android: the back button closes dialogs, menus and the full-screen player first, and works on Android 16 (apps targeting API 36 no longer receive `onBackPressed`).
 - Android: back no longer returns to the "Lagi nyiapin Svara…" loading screen.
+- Android head units: lists scroll by touch again. Touchscreens that report as a mouse or stylus are turned into finger touches (with a drag-to-scroll fallback in the page), and the layout no longer depends on `dvh` units, which WebView before Chromium 108 ignores.
 - Android: cover art shows in the notification and on the lock screen (relative image URLs were ignored) and is downscaled to save memory.
 - Android: the notification is rebuilt only when the song, cover or play state changes.
 - Android: a crashed WebView renderer reloads the app instead of force-closing it.

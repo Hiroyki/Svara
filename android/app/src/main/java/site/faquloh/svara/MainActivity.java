@@ -17,6 +17,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -264,6 +266,61 @@ public class MainActivity extends Activity {
             // Jangan matiin musik: cukup pindah ke belakang kayak app musik lain
             else moveTaskToBack(true);
         });
+    }
+
+    /*
+     * Banyak head unit Android (layar mobil) ngelaporin touchscreen-nya sebagai MOUSE. Akibatnya WebView
+     * nganggep geser jari = drag mouse: tap tetap jalan, tapi daftar nggak bisa digulir. Event kayak gini
+     * diubah jadi sentuhan jari biasa sebelum sampai ke WebView. Klik kanan/tengah mouse asli dibiarin.
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        if (!fromMouse(e)) return super.dispatchTouchEvent(e);
+        MotionEvent f = asFinger(e);
+        try {
+            return super.dispatchTouchEvent(f);
+        } finally {
+            f.recycle();
+        }
+    }
+
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent e) {
+        // Pasangan BUTTON_PRESS/RELEASE dari "mouse" tadi dibuang: tap-nya udah dikirim sebagai sentuhan,
+        // kalau ikut diterusin WebView bisa dapet klik dobel atau mouse yang "nyangkut" ketekan
+        int a = e.getActionMasked();
+        if ((a == MotionEvent.ACTION_BUTTON_PRESS || a == MotionEvent.ACTION_BUTTON_RELEASE) && fromMouse(e)) return true;
+        return super.dispatchGenericMotionEvent(e);
+    }
+
+    private static boolean fromMouse(MotionEvent e) {
+        if ((e.getButtonState() & ~MotionEvent.BUTTON_PRIMARY) != 0) return false;
+        int a = e.getActionMasked();
+        if ((a == MotionEvent.ACTION_BUTTON_PRESS || a == MotionEvent.ACTION_BUTTON_RELEASE)
+                && e.getActionButton() != MotionEvent.BUTTON_PRIMARY) return false;
+        // Selain mouse, ada juga yang ngaku stylus atau tipe "unknown"; semua yang bukan jari diperlakukan sama
+        if (!e.isFromSource(InputDevice.SOURCE_TOUCHSCREEN)) return true;
+        for (int i = 0; i < e.getPointerCount(); i++) {
+            if (e.getToolType(i) != MotionEvent.TOOL_TYPE_FINGER) return true;
+        }
+        return false;
+    }
+
+    private static MotionEvent asFinger(MotionEvent e) {
+        int n = e.getPointerCount();
+        MotionEvent.PointerProperties[] pp = new MotionEvent.PointerProperties[n];
+        MotionEvent.PointerCoords[] pc = new MotionEvent.PointerCoords[n];
+        for (int i = 0; i < n; i++) {
+            pp[i] = new MotionEvent.PointerProperties();
+            e.getPointerProperties(i, pp[i]);
+            pp[i].toolType = MotionEvent.TOOL_TYPE_FINGER;
+            pc[i] = new MotionEvent.PointerCoords();
+            e.getPointerCoords(i, pc[i]);
+            if (pc[i].pressure <= 0) pc[i].pressure = 1f;
+            if (pc[i].size <= 0) pc[i].size = 0.1f;
+        }
+        return MotionEvent.obtain(e.getDownTime(), e.getEventTime(), e.getAction(), n, pp, pc, e.getMetaState(), 0,
+                1f, 1f, e.getDeviceId(), e.getEdgeFlags(), InputDevice.SOURCE_TOUCHSCREEN, e.getFlags());
     }
 
     @Override
