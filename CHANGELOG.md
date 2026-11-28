@@ -8,6 +8,7 @@
 - `build-android.sh` and `build-linux.py`.
 - Lite mode: turns off blur, backdrop filters, endless background animations and the spectrum analyser. On by default in the Android app and on devices with ≤4 GB RAM or ≤4 CPU cores; toggle it in the Sound panel.
 - Android: seek bar in the media notification and on the lock screen; playback pauses when headphones are unplugged or Bluetooth disconnects.
+- Android Auto: Svara shows up in the car's media apps, with the current queue to pick songs from and the usual playback controls. Songs still play through the app on the phone, so open Svara there first.
 
 ### Changed
 - `server.py` can run yt-dlp in-process (`PUTAR_INPROC=1`) and save offline songs without ffmpeg, writing tags and cover art with mutagen.

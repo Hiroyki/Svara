@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +13,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -25,25 +26,40 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
 import androidx.core.content.ContextCompat;
+import androidx.media.MediaBrowserServiceCompat;
 import androidx.media.app.NotificationCompat.MediaStyle;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Foreground service: jaga proses (dan server.py) tetap hidup pas app di belakang/layar mati,
  * plus notifikasi pemutar + kontrol dari lock screen, headset, dan Bluetooth.
  * Audionya sendiri diputar WebView; tombol di sini cuma diteruskan ke handler mediaSession di app.js.
+ *
+ * Juga MediaBrowserService buat Android Auto: antrean diambil dari /api/remote/state (dikirim app.js),
+ * dan milih lagu dari layar mobil dikirim balik lewat /api/remote/cmd (dibaca pollRemote di app.js).
  */
-public class PlaybackService extends Service {
+public class PlaybackService extends MediaBrowserServiceCompat {
     private static final String CHANNEL = "playback";
     private static final int NOTIF_ID = 1;
     private static final int ART_PX = 512;
     static final String ACTION_MEDIA = "site.faquloh.svara.MEDIA";
+    private static final String ROOT = "root";
+    private static final String OPEN = "open";
 
     /** Penerus aksi ke WebView (play, pause, nexttrack, previoustrack, seekto:&lt;detik&gt;); diisi MainActivity. */
     static volatile Consumer<String> sink;
@@ -60,6 +76,10 @@ public class PlaybackService extends Service {
     private long positionAt = SystemClock.elapsedRealtime();
     /** Isi notifikasi terakhir yang dipasang, biar nggak dibikin ulang kalau nggak ada yang berubah. */
     private String shown = "";
+    /** Antrean versi mobil (Android Auto); diambil dari server lokal di thread io. */
+    private final ExecutorService io = Executors.newSingleThreadExecutor();
+    private long activeQi = MediaSessionCompat.QueueItem.UNKNOWN_ID;
+    private final Runnable carRefresh = this::refreshCarQueue;
 
     /** Headset dicabut / Bluetooth putus: jeda, jangan tiba-tiba bunyi dari speaker HP. */
     private final BroadcastReceiver noisy = new BroadcastReceiver() {
@@ -91,6 +111,9 @@ public class PlaybackService extends Service {
             }
             s.playing = isPlaying;
             s.refresh();
+            // app.js ngirim antrean ke server ~0,7 detik habis berubah (debounce saveState + pushRemote)
+            s.main.removeCallbacks(s.carRefresh);
+            s.main.postDelayed(s.carRefresh, 1200);
         });
     }
 
@@ -135,7 +158,21 @@ public class PlaybackService extends Service {
         }
         session = new MediaSessionCompat(this, "Svara");
         session.setCallback(new MediaSessionCompat.Callback() {
-            @Override public void onPlay() { send("play"); }
+            @Override public void onPlay() {
+                if (sink == null) openApp();
+                else send("play");
+            }
+            @Override public void onPlayFromMediaId(String id, Bundle extras) {
+                if (id != null && id.startsWith("qi:")) {
+                    try {
+                        jump(Integer.parseInt(id.substring(3)));
+                        return;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                openApp();
+            }
+            @Override public void onSkipToQueueItem(long id) { jump((int) id); }
             @Override public void onPause() { send("pause"); }
             @Override public void onSkipToNext() { send("nexttrack"); }
             @Override public void onSkipToPrevious() { send("previoustrack"); }
@@ -149,7 +186,9 @@ public class PlaybackService extends Service {
         });
         Intent open = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         session.setSessionActivity(PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE));
+        session.setQueueTitle("Antrean");
         session.setActive(true);
+        setSessionToken(session.getSessionToken());
         ContextCompat.registerReceiver(this, noisy, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY),
                 ContextCompat.RECEIVER_NOT_EXPORTED);
         Server.start(this);
@@ -163,6 +202,143 @@ public class PlaybackService extends Service {
         int type = Build.VERSION.SDK_INT >= 29 ? ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK : 0;
         ServiceCompat.startForeground(this, NOTIF_ID, build(), type);
         return START_STICKY;
+    }
+
+    // ---------- Android Auto ----------
+
+    @Override
+    public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {
+        return new BrowserRoot(ROOT, null);
+    }
+
+    @Override
+    public void onLoadChildren(String parentId, Result<List<MediaBrowserCompat.MediaItem>> result) {
+        if (!ROOT.equals(parentId)) {
+            result.sendResult(new ArrayList<>());
+            return;
+        }
+        result.detach();
+        io.execute(() -> {
+            CarQueue q = fetchCarQueue();
+            main.post(() -> {
+                applyCarQueue(q);
+                result.sendResult(q.items);
+            });
+        });
+    }
+
+    private static final class CarQueue {
+        final List<MediaBrowserCompat.MediaItem> items = new ArrayList<>();
+        final List<MediaSessionCompat.QueueItem> queue = new ArrayList<>();
+        long active = MediaSessionCompat.QueueItem.UNKNOWN_ID;
+    }
+
+    /** Jalan di thread io: baca antrean yang dilaporin app.js ke server lokal. */
+    private CarQueue fetchCarQueue() {
+        CarQueue q = new CarQueue();
+        if (sink != null) {
+            try {
+                JSONObject st = new JSONObject(http("GET", "api/remote/state", null));
+                int idx = st.optInt("idx", -1);
+                JSONArray arr = st.optJSONArray("queue");
+                for (int k = 0; arr != null && k < arr.length(); k++) {
+                    JSONObject t = arr.getJSONObject(k);
+                    int i = t.getInt("i");
+                    String artist = t.optString("artist");
+                    MediaDescriptionCompat d = new MediaDescriptionCompat.Builder()
+                            .setMediaId("qi:" + i)
+                            .setTitle(t.optString("title", "Tanpa judul"))
+                            .setSubtitle(i == idx ? "Sedang diputar · " + artist : artist)
+                            .build();
+                    q.items.add(new MediaBrowserCompat.MediaItem(d, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
+                    q.queue.add(new MediaSessionCompat.QueueItem(d, i));
+                    if (i == idx) q.active = i;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        if (q.items.isEmpty()) {
+            MediaDescriptionCompat d = new MediaDescriptionCompat.Builder()
+                    .setMediaId(OPEN)
+                    .setTitle(sink == null ? "Buka Svara di HP dulu" : "Antrean masih kosong")
+                    .setSubtitle(sink == null ? "Habis itu antrean lagunya muncul di sini" : "Putar lagu dari HP, nanti antreannya muncul di sini")
+                    .build();
+            q.items.add(new MediaBrowserCompat.MediaItem(d, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
+        }
+        return q;
+    }
+
+    private void applyCarQueue(CarQueue q) {
+        session.setQueue(q.queue.isEmpty() ? null : q.queue);
+        activeQi = q.active;
+        pushState();
+    }
+
+    private void refreshCarQueue() {
+        io.execute(() -> {
+            CarQueue q = fetchCarQueue();
+            main.post(() -> {
+                if (instance != this) return;
+                applyCarQueue(q);
+                notifyChildrenChanged(ROOT);
+            });
+        });
+    }
+
+    /** Lagu dipilih dari layar mobil: suruh app.js muter nomor antrean itu (lewat pollRemote). */
+    private void jump(int i) {
+        if (sink == null) {
+            openApp();
+            return;
+        }
+        io.execute(() -> {
+            try {
+                http("POST", "api/remote/cmd", new JSONObject().put("cmd", "jump").put("index", i).toString());
+            } catch (Exception ignored) {
+            }
+        });
+    }
+
+    /**
+     * Audionya diputar WebView di MainActivity, jadi tanpa app kebuka nggak ada yang bisa bunyi.
+     * Coba buka app-nya (Android 10+ sering nolak dari belakang), dan kasih tahu di layar mobil.
+     */
+    private void openApp() {
+        try {
+            startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        } catch (Exception ignored) {
+        }
+        if (sink == null) {
+            session.setPlaybackState(new PlaybackStateCompat.Builder()
+                    .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID)
+                    .setState(PlaybackStateCompat.STATE_ERROR, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 0f)
+                    .setErrorMessage(PlaybackStateCompat.ERROR_CODE_APP_ERROR, "Buka Svara di HP dulu, terus putar lagi")
+                    .build());
+        }
+    }
+
+    private static String http(String method, String path, String body) throws Exception {
+        HttpURLConnection c = (HttpURLConnection) new URL(Server.HOME + path).openConnection();
+        c.setConnectTimeout(3000);
+        c.setReadTimeout(5000);
+        c.setRequestMethod(method);
+        if (body != null) {
+            byte[] b = body.getBytes(StandardCharsets.UTF_8);
+            c.setDoOutput(true);
+            c.setRequestProperty("Content-Type", "application/json");
+            c.setRequestProperty("X-Senandung-Remote", "1");
+            try (OutputStream out = c.getOutputStream()) {
+                out.write(b);
+            }
+        }
+        try (InputStream in = c.getInputStream(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[16 * 1024];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            return out.toString("UTF-8");
+        } finally {
+            c.disconnect();
+        }
     }
 
     private void send(String action) {
@@ -206,10 +382,12 @@ public class PlaybackService extends Service {
 
     private void pushState() {
         long actions = PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE
-                | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
+                | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                | PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID;
         if (durationMs > 0) actions |= PlaybackStateCompat.ACTION_SEEK_TO;
         session.setPlaybackState(new PlaybackStateCompat.Builder()
                 .setActions(actions)
+                .setActiveQueueItemId(activeQi)
                 .setState(playing ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
                         durationMs > 0 ? positionMs : PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,
                         playing ? rate : 0f, positionAt)
@@ -277,16 +455,13 @@ public class PlaybackService extends Service {
     @Override
     public void onDestroy() {
         instance = null;
+        main.removeCallbacks(carRefresh);
+        io.shutdownNow();
         try {
             unregisterReceiver(noisy);
         } catch (Exception ignored) {
         }
         session.release();
         super.onDestroy();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }
