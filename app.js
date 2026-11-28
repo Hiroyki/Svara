@@ -2768,6 +2768,102 @@ $('#view').addEventListener('scroll', () => $('.top').classList.toggle('scrolled
   });
 }
 
+// Head unit Android: layar sentuhnya kadang kebaca sebagai mouse/stylus, jadi geser jari nggak nge-scroll
+// (tap doang yang jalan). Cadangan kalau konversi di MainActivity nggak kena: geser = scroll manual + efek lempar.
+if (/SvaraAndroid/.test(navigator.userAgent)) {
+  let d = null;
+  let fling = 0;
+  let eatClick = false;
+  const canScroll = (el, axis) => {
+    const cs = getComputedStyle(el);
+    const ov = axis === 'y' ? cs.overflowY : cs.overflowX;
+    if (!/(auto|scroll)/.test(ov)) return false;
+    return axis === 'y' ? el.scrollHeight > el.clientHeight + 1 : el.scrollWidth > el.clientWidth + 1;
+  };
+  const findScroller = (el, axis) => {
+    for (; el && el !== document.body && el !== document.documentElement; el = el.parentElement) if (canScroll(el, axis)) return el;
+    return null;
+  };
+  // Selama digeser manual, scroll-snap dimatiin: tiap ubah scrollLeft dari kode, Chrome nge-snap balik
+  // ke kartu terdekat, jadi baris kartu kerasa nyangkut. Dibalikin lagi pas geseran/lemparan selesai.
+  let unsnap = null;
+  const release = () => { if (unsnap) { unsnap(); unsnap = null; } };
+  const hold = (el) => {
+    release();
+    const prev = el.style.scrollSnapType;
+    el.style.scrollSnapType = 'none';
+    unsnap = () => { el.style.scrollSnapType = prev; };
+  };
+  // Auto-scroll lirik cuma ngalah ke wheel/touchmove; geseran manual ini juga harus dihitung
+  const scrollBy = (g, v) => {
+    if (g.axis === 'y') g.el.scrollTop -= v; else g.el.scrollLeft -= v;
+    if (g.lyr) userScrollUntil = Date.now() + 3000;
+  };
+  document.addEventListener('pointerdown', (e) => {
+    cancelAnimationFrame(fling);
+    release();
+    eatClick = false;
+    d = null;
+    if (e.pointerType === 'touch' || e.button !== 0 || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+    d = { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, vy: 0, target: e.target, el: null, axis: null, lyr: false };
+  }, { capture: true, passive: true });
+  document.addEventListener('pointermove', (e) => {
+    if (!d) return;
+    if (!d.el) {
+      const ax = Math.abs(e.clientX - d.x0);
+      const ay = Math.abs(e.clientY - d.y0);
+      if (Math.max(ax, ay) < 8) return;
+      const pref = ay >= ax ? 'y' : 'x';
+      d.axis = pref;
+      d.el = findScroller(d.target, pref);
+      // Geser horizontal di dalam daftar vertikal (atau sebaliknya): pakai sumbu yang emang bisa digulir
+      if (!d.el) { d.axis = pref === 'y' ? 'x' : 'y'; d.el = findScroller(d.target, d.axis); }
+      if (!d.el) { d = null; return; }
+      d.lyr = !!d.el.closest('#npRight');
+      hold(d.el);
+    }
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    const dt = Math.max(1, e.timeStamp - d.t);
+    scrollBy(d, d.axis === 'y' ? dy : dx);
+    d.vx = 0.8 * (dx / dt) + 0.2 * d.vx;
+    d.vy = 0.8 * (dy / dt) + 0.2 * d.vy;
+    d.x = e.clientX;
+    d.y = e.clientY;
+    d.t = e.timeStamp;
+  }, { capture: true, passive: true });
+  const end = (e) => {
+    if (!d) return;
+    const g = d;
+    d = null;
+    if (!g.el) return;
+    // Klik yang nyusul pointerup ini dibuang; pointerdown berikutnya ngereset, jadi tap baru nggak ikut ketelan
+    eatClick = e.type === 'pointerup';
+    let v = (g.axis === 'y' ? g.vy : g.vx) * 16;
+    if (e.timeStamp - g.t > 100 || Math.abs(v) < 2) return release();
+    const step = () => {
+      scrollBy(g, v);
+      v *= 0.95;
+      if (Math.abs(v) > 0.5) fling = requestAnimationFrame(step);
+      else release();
+    };
+    fling = requestAnimationFrame(step);
+  };
+  document.addEventListener('pointerup', end, { capture: true, passive: true });
+  document.addEventListener('pointercancel', end, { capture: true, passive: true });
+  // Habis geser, jangan sampai jari dilepas di atas lagu malah dianggap klik
+  document.addEventListener('click', (e) => {
+    if (!eatClick) return;
+    eatClick = false;
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+  // Baris lagu draggable="true": dari mouse/stylus, drag HTML5 bakal nyerobot geseran, jadi dimatiin.
+  // Begitu juga blok teks (judul halaman bisa diblok) biar nggak ikut keblok waktu digeser.
+  document.addEventListener('dragstart', (e) => { if (d) e.preventDefault(); }, true);
+  document.addEventListener('selectstart', (e) => { if (d) e.preventDefault(); }, true);
+}
+
 let toastT;
 /* ---------- sapaan yang ganti-ganti ---------- */
 

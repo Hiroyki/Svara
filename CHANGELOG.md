@@ -8,6 +8,7 @@
 - `build-android.sh` and `build-linux.py`.
 - Lite mode: turns off blur, backdrop filters, endless background animations and the spectrum analyser. On by default in the Android app and on devices with ≤4 GB RAM or ≤4 CPU cores; toggle it in the Sound panel.
 - Android: seek bar in the media notification and on the lock screen; playback pauses when headphones are unplugged or Bluetooth disconnects.
+- Android Auto: Svara shows up in the car's media apps, with the current queue to pick songs from and the usual playback controls. Songs still play through the app on the phone, so open Svara there first.
 
 ### Changed
 - `server.py` can run yt-dlp in-process (`PUTAR_INPROC=1`) and save offline songs without ffmpeg, writing tags and cover art with mutagen.
@@ -18,6 +19,7 @@
 ### Fixed
 - Android: the back button closes dialogs, menus and the full-screen player first, and works on Android 16 (apps targeting API 36 no longer receive `onBackPressed`).
 - Android: back no longer returns to the "Lagi nyiapin Svara…" loading screen.
+- Android head units: lists scroll by touch again. Touchscreens that report as a mouse or stylus are turned into finger touches (with a drag-to-scroll fallback in the page), and the layout no longer depends on `dvh` units, which WebView before Chromium 108 ignores.
 - Android: cover art shows in the notification and on the lock screen (relative image URLs were ignored) and is downscaled to save memory.
 - Android: the notification is rebuilt only when the song, cover or play state changes.
 - Android: a crashed WebView renderer reloads the app instead of force-closing it.
